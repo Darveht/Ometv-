@@ -1,19 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" >
-<head>
-  <meta charset="UTF-8">
-  <title>Untitled</title>
-  
-
-</head>
-<body>
-<!-- partial:index.partial.html -->
-<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VideoMeet - Videollamadas Aleatorias</title>
+  <title>BealyChat - Videollamadas Aleatorias</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Firebase (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app-compat.js"></script>
@@ -46,6 +36,17 @@
       height: 100vh;
       position: relative;
       overflow: hidden;
+    }
+    /* Marca de agua fija */
+    .watermark {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      color: rgba(255, 255, 255, 0.7);
+      z-index: 1000;
+      pointer-events: none;
     }
     .screen {
       width: 100vw;
@@ -227,26 +228,32 @@
       height: 100%;
       position: relative;
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
+      background-color: #000;
     }
-    .video-call {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    .remote-video, .local-video {
-      flex: 1;
+    .remote-video {
+      width: 100%;
+      height: 100%;
       position: relative;
       background-color: #000;
       overflow: hidden;
     }
-    .remote-video video, .local-video video {
+    .remote-video video {
       width: 100%;
       height: 100%;
       object-fit: cover;
       margin: 0;
       padding: 0;
+    }
+    /* Vista local en overlay (preview) */
+    .local-video-preview {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 150px;
+      border: 2px solid #fff;
+      border-radius: 8px;
+      z-index: 10;
+      background-color: #000;
     }
     .video-controls {
       position: absolute;
@@ -255,7 +262,7 @@
       transform: translateX(-50%);
       display: flex;
       gap: 20px;
-      z-index: 10;
+      z-index: 11;
     }
     .control-btn {
       width: 50px;
@@ -335,12 +342,14 @@
   </style>
 </head>
 <body>
+  <!-- Marca de agua -->
+  <div class="watermark">BealyChat</div>
   <div class="container">
     <!-- =========================== LOGIN SCREEN =========================== -->
     <div class="screen active" id="loginScreen">
       <div class="screen-content">
         <div class="logo">
-          <h1>VideoMeet</h1>
+          <h1>BealyChat</h1>
           <p>Conecta con personas de todo el mundo</p>
         </div>
         <form id="loginForm">
@@ -353,9 +362,10 @@
           </div>
           <div class="form-group">
             <label for="password">Contraseña</label>
-            <div class="input-group">
+            <div class="input-group" style="position: relative;">
               <i class="fa-solid fa-lock"></i>
               <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
+              <!-- Si se desea se podría agregar un GIF similar al de registro -->
             </div>
           </div>
           <button type="button" class="btn btn-primary" onclick="loginUser()">Iniciar Sesión</button>
@@ -381,7 +391,7 @@
     <div class="screen" id="registerScreen">
       <div class="screen-content">
         <div class="logo">
-          <h1>VideoMeet</h1>
+          <h1>BealyChat</h1>
           <p>Crea tu cuenta</p>
         </div>
         <form id="registerForm">
@@ -394,16 +404,20 @@
           </div>
           <div class="form-group">
             <label for="registerPassword">Contraseña</label>
-            <div class="input-group">
+            <div class="input-group" style="position: relative;">
               <i class="fa-solid fa-lock"></i>
               <input type="password" id="registerPassword" placeholder="Crea una contraseña" required>
+              <!-- GIF del mono, inicialmente oculto -->
+              <img id="passwordMonkey" src="https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f648.gif" style="display: none; position: absolute; top: -20px; right: 10px; width: 30px;">
             </div>
           </div>
           <div class="form-group">
             <label for="confirmPassword">Confirmar contraseña</label>
-            <div class="input-group">
+            <div class="input-group" style="position: relative;">
               <i class="fa-solid fa-lock"></i>
               <input type="password" id="confirmPassword" placeholder="Confirma tu contraseña" required>
+              <!-- Segundo GIF para el campo de confirmación -->
+              <img id="passwordMonkeyConfirm" src="https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f648.gif" style="display: none; position: absolute; top: -20px; right: 10px; width: 30px;">
             </div>
           </div>
           <button type="button" class="btn btn-primary" onclick="registerUser()">Registrarse</button>
@@ -426,7 +440,7 @@
     <div class="screen" id="forgotPasswordScreen">
       <div class="screen-content">
         <div class="logo">
-          <h1>VideoMeet</h1>
+          <h1>BealyChat</h1>
           <p>Recupera tu contraseña</p>
         </div>
         <form id="forgotPasswordForm">
@@ -447,7 +461,7 @@
     <div class="screen" id="profileSetupScreen">
       <div class="screen-content">
         <div class="logo">
-          <h1>VideoMeet</h1>
+          <h1>BealyChat</h1>
           <p>Configura tu perfil</p>
         </div>
         <div>
@@ -472,7 +486,7 @@
     <div class="screen" id="countryScreen">
       <div class="screen-content">
         <div class="logo">
-          <h1>VideoMeet</h1>
+          <h1>BealyChat</h1>
           <p>Selecciona tu país</p>
         </div>
         <div>
@@ -499,25 +513,22 @@
     <!-- =========================== VIDEO CALL SCREEN =========================== -->
     <div class="screen" id="videoCallScreen">
       <div class="video-container">
-        <div class="video-call">
-          <div class="remote-video" id="remoteVideoContainer">
-            <!-- Video remoto inicia en mute para permitir autoplay -->
-            <video id="remoteVideo" autoplay playsinline muted></video>
-            <div class="user-info" id="remoteUserInfo">
-              <img id="remoteAvatar" src="/api/placeholder/30/30" alt="User">
-              <span id="remoteName">Desconocido</span>
-            </div>
-            <div class="connecting" id="connectingIndicator">
-              <div style="text-align:center;">
-                <i class="fa-solid fa-spinner fa-spin" style="font-size:24px;"></i>
-                <p style="margin-top:10px;">Conectando...</p>
-              </div>
-            </div>
+        <div class="remote-video" id="remoteVideoContainer">
+          <!-- El video remoto se carga sin muted para permitir audio -->
+          <video id="remoteVideo" autoplay playsinline></video>
+          <div class="user-info" id="remoteUserInfo">
+            <img id="remoteAvatar" src="/api/placeholder/30/30" alt="User">
+            <span id="remoteName">Desconocido</span>
           </div>
-          <div class="local-video">
-            <video id="localVideo" autoplay playsinline muted></video>
+          <div class="connecting" id="connectingIndicator">
+            <div style="text-align:center;">
+              <i class="fa-solid fa-spinner fa-spin" style="font-size:24px;"></i>
+              <p style="margin-top:10px;">Conectando...</p>
+            </div>
           </div>
         </div>
+        <!-- Vista local como preview en overlay -->
+        <video id="localVideo" class="local-video-preview" autoplay playsinline muted></video>
         <div class="video-controls">
           <div class="control-btn" onclick="toggleAudio()">
             <i class="fa-solid fa-microphone-slash" id="micIcon"></i>
@@ -539,14 +550,14 @@
   <script>
     /* ====================== INICIALIZAR FIREBASE ====================== */
     const firebaseConfig = {
-      apiKey: "AIzaSyBziV6Jvh9KQZpsh8HtCtbX51H_qKJgZzM",
-  authDomain: "ometv-67dc0.firebaseapp.com",
-  databaseURL: "https://ometv-67dc0-default-rtdb.firebaseio.com",
-  projectId: "ometv-67dc0",
-  storageBucket: "ometv-67dc0.firebasestorage.app",
-  messagingSenderId: "874118207646",
-  appId: "1:874118207646:web:0068f610484d73705ec38f",
-  measurementId: "G-NNSSK6W00L"
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_AUTH_DOMAIN",
+      databaseURL: "TU_DATABASE_URL",
+      projectId: "TU_PROJECT_ID",
+      storageBucket: "TU_STORAGE_BUCKET",
+      messagingSenderId: "TU_MESSAGING_SENDER_ID",
+      appId: "TU_APP_ID",
+      measurementId: "TU_MEASUREMENT_ID"
     };
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
@@ -636,7 +647,6 @@
       if(user) {
         currentUser = user;
         console.log("Usuario autenticado:", user.uid);
-        // Revisar si el perfil ya existe y está completo
         database.ref('profiles/' + user.uid).once('value', snapshot => {
           if(snapshot.exists()){
             currentProfile = snapshot.val();
@@ -947,10 +957,20 @@
         restartCall();
       }
     });
+
+    /* ====================== EVENTOS PARA MOSTRAR EL GIF DEL MONO ====================== */
+    document.getElementById('registerPassword').addEventListener('focus', () => {
+      document.getElementById('passwordMonkey').style.display = 'block';
+    });
+    document.getElementById('registerPassword').addEventListener('blur', () => {
+      document.getElementById('passwordMonkey').style.display = 'none';
+    });
+    document.getElementById('confirmPassword').addEventListener('focus', () => {
+      document.getElementById('passwordMonkeyConfirm').style.display = 'block';
+    });
+    document.getElementById('confirmPassword').addEventListener('blur', () => {
+      document.getElementById('passwordMonkeyConfirm').style.display = 'none';
+    });
   </script>
-</body>
-</html>
-<!-- partial -->
-  
 </body>
 </html>
