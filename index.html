@@ -48,6 +48,15 @@
       z-index: 1000;
       pointer-events: none;
     }
+    /* Icono de ajustes (settings) en esquina superior derecha */
+    .settings-icon {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 1100;
+      width: 40px;
+      cursor: pointer;
+    }
     .screen {
       width: 100vw;
       height: 100vh;
@@ -244,7 +253,7 @@
       margin: 0;
       padding: 0;
     }
-    /* En este modo cada usuario verá únicamente el video remoto (la cámara del otro) */
+    /* En este modo cada usuario ve sólo la cámara del otro */
     .video-controls {
       position: absolute;
       bottom: 20px;
@@ -337,7 +346,6 @@
       font-size: 24px;
       margin-bottom: 20px;
     }
-    /* Aquí puedes agregar estilos adicionales para un efecto "spiral" al selector de fecha */
     .birthdate-container input[type="date"] {
       width: 100%;
       padding: 15px;
@@ -352,7 +360,7 @@
     .birthdate-container input[type="date"]:focus {
       border-color: var(--primary-color);
     }
-    /* PANTALLA DE CUENTA BLOQUEADA */
+    /* ====================== PANTALLA DE CUENTA BLOQUEADA ====================== */
     .blocked-screen {
       display: flex;
       flex-direction: column;
@@ -370,13 +378,81 @@
     .blocked-screen p {
       font-size: 18px;
     }
+    /* ====================== MODAL DE AJUSTES (SETTINGS) ====================== */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 1200;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    .modal.active {
+      display: block;
+    }
+    .modal-content {
+      background: var(--dark-bg);
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 600px;
+      margin: 40px auto;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--light-text);
+    }
+    /* Estilos para el grid de fotos (6 fotos en cuadrícula 3x2) */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-gap: 10px;
+      margin-top: 20px;
+    }
+    .photo-grid .photo-slot {
+      width: 100%;
+      padding-top: 100%;
+      position: relative;
+      background-color: #333;
+      border-radius: 4px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .photo-grid .photo-slot img {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    /* ====================== MODAL DE REPORTE ====================== */
+    .report-options {
+      text-align: left;
+      margin: 20px 0;
+    }
+    .report-options label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
   <!-- Marca de agua -->
   <div class="watermark">BealyChat</div>
+  <!-- Icono de Ajustes en la esquina superior derecha -->
+  <img class="settings-icon" src="https://images.vexels.com/media/users/3/153359/isolated/preview/f253c46ff6fb727415fc70750ac1fb6e-configuracion-del-sistema-icono-de-trazo-de-color.png?w=360" alt="Ajustes" onclick="openSettingsModal()">
+
   <div class="container">
-    <!-- =========================== LOGIN SCREEN =========================== -->
+    <!-- PANTALLAS EXISTENTES (LOGIN, REGISTER, FORGOT, PROFILE, BIRTHDATE, COUNTRY, VIDEO CALL, BLOCKED) -->
+    <!-- (Se mantienen las mismas pantallas que antes; se omiten comentarios para resumir el código existente) -->
     <div class="screen active" id="loginScreen">
       <div class="screen-content">
         <div class="logo">
@@ -403,9 +479,7 @@
         <div class="links">
           <a href="#" onclick="toggleForm('forgotPasswordForm')">¿Olvidaste tu contraseña?</a>
         </div>
-        <div class="divider">
-          <span>O continúa con</span>
-        </div>
+        <div class="divider"><span>O continúa con</span></div>
         <div class="social-login">
           <div class="social-btn"><i class="fab fa-google"></i></div>
           <div class="social-btn"><i class="fab fa-facebook-f"></i></div>
@@ -417,7 +491,6 @@
       </div>
     </div>
 
-    <!-- =========================== REGISTER SCREEN =========================== -->
     <div class="screen" id="registerScreen">
       <div class="screen-content">
         <div class="logo">
@@ -450,9 +523,7 @@
           </div>
           <button type="button" class="btn btn-primary" onclick="registerUser()">Registrarse</button>
         </form>
-        <div class="divider">
-          <span>O regístrate con</span>
-        </div>
+        <div class="divider"><span>O regístrate con</span></div>
         <div class="social-login">
           <div class="social-btn"><i class="fab fa-google"></i></div>
           <div class="social-btn"><i class="fab fa-facebook-f"></i></div>
@@ -464,7 +535,6 @@
       </div>
     </div>
 
-    <!-- =========================== FORGOT PASSWORD SCREEN =========================== -->
     <div class="screen" id="forgotPasswordScreen">
       <div class="screen-content">
         <div class="logo">
@@ -485,7 +555,6 @@
       </div>
     </div>
 
-    <!-- =========================== PROFILE SETUP SCREEN =========================== -->
     <div class="screen" id="profileSetupScreen">
       <div class="screen-content">
         <div class="logo">
@@ -505,23 +574,20 @@
               <input type="text" id="username" placeholder="Elige un nombre de usuario" required>
             </div>
           </div>
-          <!-- Ahora el botón continúa al siguiente slide de fecha de nacimiento -->
+          <!-- Continuar a la siguiente pantalla: Fecha de nacimiento -->
           <button type="button" class="btn btn-primary mt-4" onclick="goToScreen('birthDateScreen')">Continuar</button>
         </div>
       </div>
     </div>
 
-    <!-- =========================== BIRTHDATE SCREEN =========================== -->
     <div class="screen" id="birthDateScreen">
       <div class="screen-content birthdate-container">
         <h2>Selecciona tu fecha de nacimiento</h2>
-        <!-- Aquí se puede mejorar el estilo para lograr un efecto spiral -->
         <input type="date" id="birthDateInput" required>
         <button type="button" class="btn btn-primary mt-4" onclick="validateBirthDate()">Continuar</button>
       </div>
     </div>
 
-    <!-- =========================== COUNTRY SCREEN =========================== -->
     <div class="screen" id="countryScreen">
       <div class="screen-content">
         <div class="logo">
@@ -549,7 +615,6 @@
       </div>
     </div>
 
-    <!-- =========================== VIDEO CALL SCREEN =========================== -->
     <div class="screen" id="videoCallScreen">
       <div class="video-container">
         <div class="remote-video" id="remoteVideoContainer">
@@ -576,24 +641,70 @@
             <i class="fa-solid fa-arrows-rotate"></i>
           </div>
         </div>
-        <div class="swipe-hint">
-          <i class="fa-solid fa-chevron-right"></i>
-        </div>
+        <div class="swipe-hint"><i class="fa-solid fa-chevron-right"></i></div>
       </div>
     </div>
 
-    <!-- =========================== BLOCKED SCREEN (CUENTA BLOQUEADA) =========================== -->
     <div class="screen" id="blockedScreen">
       <div class="screen-content blocked-screen">
         <h2>Lo sentimos</h2>
         <p>
-          Su cuenta ha sido bloqueada porque es menor de edad.<br>
+          Su cuenta ha sido bloqueada porque es menor de edad o por infracciones a la comunidad.<br>
           No podrá acceder a la aplicación.<br>
-          Cuando cumpla 18 años, por favor póngase en contacto con soporte para activar su cuenta.
+          Su cuenta estará disponible dentro de tres días aproximadamente.<br>
+          Si cree que es un error, póngase en contacto con soporte.
         </p>
       </div>
     </div>
+  </div>
 
+  <!-- ====================== MODAL DE AJUSTES (SETTINGS) ====================== -->
+  <div class="modal" id="settingsModal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeSettingsModal()">&times;</span>
+      <!-- Datos del perfil -->
+      <h2>Mi Perfil</h2>
+      <div id="profileInfo">
+        <img id="modalAvatar" src="/api/placeholder/100/100" alt="Avatar" style="width:100px; height:100px; border-radius:50%;"><br>
+        <strong id="modalUsername">Usuario</strong><br>
+        <span id="modalEmail">correo@ejemplo.com</span>
+      </div>
+      <!-- Sección para subir fotos en cuadrícula -->
+      <h3>Mis Fotos</h3>
+      <div class="photo-grid" id="photoGrid">
+        <!-- Se generan 6 slots -->
+        <div class="photo-slot" onclick="uploadPhoto(0)" id="slot0"></div>
+        <div class="photo-slot" onclick="uploadPhoto(1)" id="slot1"></div>
+        <div class="photo-slot" onclick="uploadPhoto(2)" id="slot2"></div>
+        <div class="photo-slot" onclick="uploadPhoto(3)" id="slot3"></div>
+        <div class="photo-slot" onclick="uploadPhoto(4)" id="slot4"></div>
+        <div class="photo-slot" onclick="uploadPhoto(5)" id="slot5"></div>
+      </div>
+      <!-- Input oculto para subir fotos (se usará para todos los slots) -->
+      <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
+      <br>
+      <button type="button" class="btn btn-primary" onclick="savePhotos()">Guardar</button>
+      <!-- Icono de reporte dentro de Ajustes -->
+      <br><br>
+      <img src="https://cdn-icons-png.flaticon.com/512/13984/13984890.png" alt="Reportar" style="width:40px; cursor:pointer;" onclick="openReportModal()">
+    </div>
+  </div>
+
+  <!-- ====================== MODAL DE REPORTE ====================== -->
+  <div class="modal" id="reportModal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeReportModal()">&times;</span>
+      <h2>Reportar Usuario</h2>
+      <p>Seleccione las opciones que describen la infracción:</p>
+      <div class="report-options">
+        <label><input type="checkbox" value="desnudos" id="reportDesnudos"> Desnudos</label>
+        <label><input type="checkbox" value="violencia_sexual" id="reportViolencia"> Violencia sexual</label>
+        <label><input type="checkbox" value="comportamiento_explicito" id="reportExplicito"> Comportamiento explícito de adultos</label>
+        <label><input type="checkbox" value="menor_de_edad" id="reportMenor"> Posible usuario menor de edad</label>
+      </div>
+      <button type="button" class="btn btn-primary" onclick="submitReport()">Enviar Reporte</button>
+      <div id="reportStatus" style="margin-top:20px;"></div>
+    </div>
   </div>
 
   <script>
@@ -614,7 +725,6 @@
     const auth = firebase.auth();
     const database = firebase.database();
 
-    // Configurar persistencia para mantener la sesión activa
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
       .then(() => console.log("Persistencia configurada"))
       .catch(error => console.error("Error configurando persistencia:", error));
@@ -626,8 +736,9 @@
     let remoteStream = null;
     let peerConnection = null;
     let currentCallId = null;
+    // Array para almacenar las fotos subidas en el modal de ajustes
+    let userPhotos = [null, null, null, null, null, null];
 
-    // Configuración STUN/TURN para WebRTC
     const configuration = {
       iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
@@ -643,7 +754,6 @@
     function goToScreen(screenId) {
       document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
       document.getElementById(screenId).classList.add('active');
-
       if(screenId === 'videoCallScreen'){
         startLocalStream();
         showConnecting();
@@ -653,7 +763,6 @@
         autoDetectCountry();
       }
     }
-
     function toggleForm(formType) {
       if(formType === 'registerForm'){
         goToScreen('registerScreen');
@@ -679,7 +788,6 @@
         })
         .catch(error => alert("Error al registrarse: " + error.message));
     }
-
     function loginUser() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
@@ -690,8 +798,6 @@
         })
         .catch(error => alert("Error al iniciar sesión: " + error.message));
     }
-
-    // Detectar cambios en la autenticación
     auth.onAuthStateChanged(user => {
       if(user) {
         currentUser = user;
@@ -700,9 +806,17 @@
           if(snapshot.exists()){
             currentProfile = snapshot.val();
             if(currentProfile.username && currentProfile.avatar_url && currentProfile.country && currentProfile.birthDate){
+              // Verificar si el usuario está bloqueado
+              if(currentProfile.blockedUntil) {
+                const now = new Date();
+                const blockedUntil = new Date(currentProfile.blockedUntil);
+                if(now < blockedUntil) {
+                  goToScreen('blockedScreen');
+                  return;
+                }
+              }
               goToScreen('videoCallScreen');
             } else if(!currentProfile.birthDate) {
-              // Si no se ha establecido la fecha de nacimiento, redirigir a ese slide
               goToScreen('birthDateScreen');
             } else {
               goToScreen('profileSetupScreen');
@@ -729,7 +843,6 @@
         reader.readAsDataURL(file);
       }
     });
-
     async function updateProfile() {
       if(!currentUser){
         alert("No hay usuario autenticado");
@@ -737,30 +850,24 @@
       }
       const username = document.getElementById('username').value;
       const country = document.getElementById('country') ? document.getElementById('country').value : "";
-      // Si ya se había seleccionado fecha de nacimiento, se guarda en currentProfile
       const birthDate = currentProfile && currentProfile.birthDate ? currentProfile.birthDate : "";
       const avatar_url = document.getElementById('avatarPreview').src || "";
       currentProfile = { username, country, birthDate, avatar_url };
       console.log("Actualizando perfil:", currentProfile);
       return database.ref('profiles/' + currentUser.uid).update(currentProfile);
     }
-
-    // Se actualiza el perfil después de seleccionar fecha de nacimiento
     function updateBirthDateAndContinue() {
       const birthDate = document.getElementById('birthDateInput').value;
       if (!birthDate) {
         alert("Por favor, selecciona tu fecha de nacimiento");
         return;
       }
-      // Se guarda la fecha en currentProfile (aunque updateProfile la guardará)
       currentProfile = currentProfile || {};
       currentProfile.birthDate = birthDate;
-      // Se actualiza el perfil con la fecha y se continúa
       updateProfile().then(() => {
         goToScreen('countryScreen');
       });
     }
-
     async function updateProfileAndConnect(){
       try {
         if(document.getElementById('username').value === ""){
@@ -790,10 +897,8 @@
       }
       console.log("Edad calculada:", age);
       if(age < 18){
-        // Mostrar pantalla de cuenta bloqueada
         goToScreen('blockedScreen');
       } else {
-        // Actualiza el perfil con la fecha y continúa
         updateBirthDateAndContinue();
       }
     }
@@ -821,7 +926,6 @@
         console.error("Perfil incompleto, no se puede marcar como online");
         return;
       }
-      // Marcar usuario online en la DB
       const userRef = database.ref('onlineUsers/' + currentUser.uid);
       await userRef.set({
         username: currentProfile.username,
@@ -833,7 +937,6 @@
       userRef.onDisconnect().remove();
       findRandomUser();
     }
-
     async function findRandomUser(){
       const snapshot = await database.ref('onlineUsers').once('value');
       const online = snapshot.val() || {};
@@ -846,7 +949,6 @@
       const randomUid = uids[Math.floor(Math.random() * uids.length)];
       createCall(randomUid);
     }
-
     async function createCall(remoteUid){
       const callId = database.ref('calls').push().key;
       currentCallId = callId;
@@ -856,8 +958,6 @@
       });
       startWebRTC(callId, true);
     }
-
-    // Escuchar nuevas llamadas para quien es "callee"
     database.ref('calls').on('child_added', snapshot => {
       const callId = snapshot.key;
       const callData = snapshot.val();
@@ -873,18 +973,14 @@
     async function startLocalStream(){
       try {
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        // Aunque no se muestra, se usa para la conexión
       } catch(error){
         console.error("Error accediendo a cámara y micrófono:", error);
         alert("No se pudo acceder a la cámara/micrófono. Verifica los permisos.");
       }
     }
-
     function startWebRTC(callId, isCaller){
       peerConnection = new RTCPeerConnection(configuration);
       console.log("Iniciando WebRTC, es caller?", isCaller);
-
-      // Agregar tracks locales a la conexión
       if(localStream){
         localStream.getTracks().forEach(track => {
           peerConnection.addTrack(track, localStream);
@@ -892,8 +988,6 @@
       } else {
         console.warn("No hay stream local disponible");
       }
-
-      // Manejar recepción de tracks remotos
       peerConnection.ontrack = (event) => {
         console.log("Evento ontrack:", event);
         const remoteVideo = document.getElementById('remoteVideo');
@@ -910,16 +1004,12 @@
         remoteVideo.play().catch(e => console.error("Error al reproducir video remoto:", e));
         hideConnecting();
       };
-
-      // Manejo de ICE candidates locales
       peerConnection.onicecandidate = event => {
         if(event.candidate){
           console.log("Enviando ICE candidate:", event.candidate);
           database.ref(`calls/${callId}/iceCandidates/${currentUser.uid}`).push(JSON.stringify(event.candidate));
         }
       };
-
-      // Escuchar ICE candidates remotos
       database.ref(`calls/${callId}/iceCandidates`).on('child_added', snapshot => {
         const userUid = snapshot.key;
         if(userUid !== currentUser.uid){
@@ -932,12 +1022,9 @@
           });
         }
       });
-
-      // Si es caller, crear y enviar oferta
       if(isCaller){
         createOffer(callId);
       } else {
-        // Si es callee, esperar la oferta
         database.ref(`calls/${callId}/offer`).on('value', async snapshot => {
           const offerData = snapshot.val();
           if(offerData){
@@ -954,8 +1041,6 @@
           }
         });
       }
-
-      // Procesar respuesta (solo para caller)
       database.ref(`calls/${callId}/answer`).on('value', async snapshot => {
         const answerData = snapshot.val();
         if(answerData && peerConnection.signalingState === 'have-local-offer'){
@@ -968,8 +1053,6 @@
           }
         }
       });
-
-      // Cargar datos del usuario remoto para mostrar nombre y avatar
       database.ref(`calls/${callId}/participants`).once('value', snap => {
         const parts = snap.val() || {};
         let remoteUid = isCaller ? parts.callee : parts.caller;
@@ -993,7 +1076,6 @@
         });
       });
     }
-
     async function createOffer(callId){
       try {
         const offer = await peerConnection.createOffer();
@@ -1004,8 +1086,6 @@
         console.error("Error creando oferta:", error);
       }
     }
-
-    /* ====================== CONTROLES DE VIDEO/ AUDIO ====================== */
     function showConnecting(){
       document.getElementById('connectingIndicator').classList.add('active');
     }
@@ -1039,8 +1119,6 @@
         findRandomUser();
       }, 2000);
     }
-
-    /* ====================== GESTO PARA CAMBIAR DE USUARIO ====================== */
     let touchStartX = 0;
     let touchEndX = 0;
     document.querySelector('.video-container').addEventListener('touchstart', e => {
@@ -1052,8 +1130,6 @@
         restartCall();
       }
     });
-
-    /* ====================== EVENTOS PARA MOSTRAR EL GIF DEL MONO ====================== */
     document.getElementById('registerPassword').addEventListener('focus', () => {
       document.getElementById('passwordMonkey').style.display = 'block';
     });
@@ -1066,6 +1142,100 @@
     document.getElementById('confirmPassword').addEventListener('blur', () => {
       document.getElementById('passwordMonkeyConfirm').style.display = 'none';
     });
+
+    /* ====================== MODAL DE AJUSTES (SETTINGS) ====================== */
+    function openSettingsModal() {
+      // Actualizar datos del modal con la info del usuario
+      if(currentUser && currentProfile) {
+        document.getElementById('modalAvatar').src = currentProfile.avatar_url || '/api/placeholder/100/100';
+        document.getElementById('modalUsername').textContent = currentProfile.username || "Usuario";
+        document.getElementById('modalEmail').textContent = currentUser.email;
+      }
+      document.getElementById('settingsModal').classList.add('active');
+    }
+    function closeSettingsModal() {
+      document.getElementById('settingsModal').classList.remove('active');
+    }
+    // Función para subir foto en algún slot (se pasa el índice del slot)
+    function uploadPhoto(slotIndex) {
+      // Guardamos el slot seleccionado globalmente y activamos el input oculto
+      window.currentPhotoSlot = slotIndex;
+      document.getElementById('photoInput').click();
+    }
+    function handlePhotoUpload(event) {
+      const file = event.target.files[0];
+      if(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          userPhotos[window.currentPhotoSlot] = e.target.result;
+          // Actualizamos el slot con la imagen
+          document.getElementById('slot' + window.currentPhotoSlot).innerHTML = `<img src="${e.target.result}" alt="Foto ${window.currentPhotoSlot+1}">`;
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+    function savePhotos() {
+      if(!currentUser) return;
+      // Se guarda en la ruta "userPhotos/[uid]" un arreglo con las fotos
+      database.ref('userPhotos/' + currentUser.uid).set(userPhotos)
+        .then(() => {
+          alert("Fotos guardadas exitosamente");
+          closeSettingsModal();
+        })
+        .catch(err => alert("Error al guardar fotos: " + err));
+    }
+
+    /* ====================== MODAL DE REPORTE ====================== */
+    function openReportModal() {
+      document.getElementById('reportModal').classList.add('active');
+    }
+    function closeReportModal() {
+      document.getElementById('reportModal').classList.remove('active');
+      document.getElementById('reportStatus').innerHTML = "";
+      // Reiniciamos las opciones
+      document.getElementById('reportDesnudos').checked = false;
+      document.getElementById('reportViolencia').checked = false;
+      document.getElementById('reportExplicito').checked = false;
+      document.getElementById('reportMenor').checked = false;
+    }
+    function submitReport() {
+      // Recopilar las opciones seleccionadas
+      const reportData = {
+        desnudos: document.getElementById('reportDesnudos').checked,
+        violencia_sexual: document.getElementById('reportViolencia').checked,
+        comportamiento_explicito: document.getElementById('reportExplicito').checked,
+        menor_de_edad: document.getElementById('reportMenor').checked,
+        reporter: currentUser ? currentUser.uid : "desconocido",
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+      };
+      // Se guarda el reporte en "reports/[reportedUserUid]/[reportKey]"
+      // Para este ejemplo, se reporta al usuario con el que se está en llamada (si existe)
+      let reportedUid = null;
+      database.ref('calls/' + currentCallId + '/participants').once('value').then(snapshot => {
+        const parts = snapshot.val();
+        if(parts) {
+          reportedUid = (parts.caller === currentUser.uid) ? parts.callee : parts.caller;
+          database.ref('reports/' + reportedUid).push(reportData)
+            .then(() => {
+              document.getElementById('reportStatus').innerHTML = "<p style='color:green;'>Enviado</p>";
+              // Simulamos bloqueo inmediato si se reporta alguna infracción (en producción se verificarían acumulados)
+              if(reportData.desnudos || reportData.violencia_sexual || reportData.comportamiento_explicito || reportData.menor_de_edad) {
+                // Establecemos bloqueo por 3 días
+                const blockedUntil = new Date();
+                blockedUntil.setDate(blockedUntil.getDate() + 3);
+                database.ref('profiles/' + reportedUid).update({ blockedUntil: blockedUntil.toISOString() });
+                // Si el usuario actual es el reportado, se muestra la pantalla de bloqueo
+                if(reportedUid === currentUser.uid) {
+                  setTimeout(() => { goToScreen('blockedScreen'); }, 1000);
+                }
+              }
+            })
+            .catch(err => {
+              document.getElementById('reportStatus').innerHTML = "<p style='color:red;'>Error: " + err.message + "</p>";
+            });
+        }
+      });
+    }
   </script>
 </body>
 </html>
