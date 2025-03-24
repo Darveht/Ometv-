@@ -244,17 +244,7 @@
       margin: 0;
       padding: 0;
     }
-    /* Vista local en overlay (preview) */
-    .local-video-preview {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      width: 150px;
-      border: 2px solid #fff;
-      border-radius: 8px;
-      z-index: 10;
-      background-color: #000;
-    }
+    /* En este modo cada usuario verá únicamente el video remoto (la cámara del otro) */
     .video-controls {
       position: absolute;
       bottom: 20px;
@@ -339,6 +329,47 @@
       opacity: 1;
       pointer-events: auto;
     }
+    /* ====================== NUEVA PANTALLA: FECHA DE NACIMIENTO ====================== */
+    .birthdate-container {
+      padding: 40px 20px;
+    }
+    .birthdate-container h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    /* Aquí puedes agregar estilos adicionales para un efecto "spiral" al selector de fecha */
+    .birthdate-container input[type="date"] {
+      width: 100%;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background-color: var(--card-bg);
+      color: var(--light-text);
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .birthdate-container input[type="date"]:focus {
+      border-color: var(--primary-color);
+    }
+    /* PANTALLA DE CUENTA BLOQUEADA */
+    .blocked-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      background-color: var(--dark-bg);
+      color: var(--light-text);
+    }
+    .blocked-screen h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    .blocked-screen p {
+      font-size: 18px;
+    }
   </style>
 </head>
 <body>
@@ -365,7 +396,6 @@
             <div class="input-group" style="position: relative;">
               <i class="fa-solid fa-lock"></i>
               <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
-              <!-- Si se desea se podría agregar un GIF similar al de registro -->
             </div>
           </div>
           <button type="button" class="btn btn-primary" onclick="loginUser()">Iniciar Sesión</button>
@@ -407,7 +437,6 @@
             <div class="input-group" style="position: relative;">
               <i class="fa-solid fa-lock"></i>
               <input type="password" id="registerPassword" placeholder="Crea una contraseña" required>
-              <!-- GIF del mono, inicialmente oculto -->
               <img id="passwordMonkey" src="https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f648.gif" style="display: none; position: absolute; top: -20px; right: 10px; width: 30px;">
             </div>
           </div>
@@ -416,7 +445,6 @@
             <div class="input-group" style="position: relative;">
               <i class="fa-solid fa-lock"></i>
               <input type="password" id="confirmPassword" placeholder="Confirma tu contraseña" required>
-              <!-- Segundo GIF para el campo de confirmación -->
               <img id="passwordMonkeyConfirm" src="https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f648.gif" style="display: none; position: absolute; top: -20px; right: 10px; width: 30px;">
             </div>
           </div>
@@ -477,8 +505,19 @@
               <input type="text" id="username" placeholder="Elige un nombre de usuario" required>
             </div>
           </div>
-          <button type="button" class="btn btn-primary mt-4" onclick="goToScreen('countryScreen')">Continuar</button>
+          <!-- Ahora el botón continúa al siguiente slide de fecha de nacimiento -->
+          <button type="button" class="btn btn-primary mt-4" onclick="goToScreen('birthDateScreen')">Continuar</button>
         </div>
+      </div>
+    </div>
+
+    <!-- =========================== BIRTHDATE SCREEN =========================== -->
+    <div class="screen" id="birthDateScreen">
+      <div class="screen-content birthdate-container">
+        <h2>Selecciona tu fecha de nacimiento</h2>
+        <!-- Aquí se puede mejorar el estilo para lograr un efecto spiral -->
+        <input type="date" id="birthDateInput" required>
+        <button type="button" class="btn btn-primary mt-4" onclick="validateBirthDate()">Continuar</button>
       </div>
     </div>
 
@@ -514,7 +553,6 @@
     <div class="screen" id="videoCallScreen">
       <div class="video-container">
         <div class="remote-video" id="remoteVideoContainer">
-          <!-- El video remoto se carga sin muted para permitir audio -->
           <video id="remoteVideo" autoplay playsinline></video>
           <div class="user-info" id="remoteUserInfo">
             <img id="remoteAvatar" src="/api/placeholder/30/30" alt="User">
@@ -527,8 +565,6 @@
             </div>
           </div>
         </div>
-        <!-- Vista local como preview en overlay -->
-        <video id="localVideo" class="local-video-preview" autoplay playsinline muted></video>
         <div class="video-controls">
           <div class="control-btn" onclick="toggleAudio()">
             <i class="fa-solid fa-microphone-slash" id="micIcon"></i>
@@ -545,19 +581,32 @@
         </div>
       </div>
     </div>
+
+    <!-- =========================== BLOCKED SCREEN (CUENTA BLOQUEADA) =========================== -->
+    <div class="screen" id="blockedScreen">
+      <div class="screen-content blocked-screen">
+        <h2>Lo sentimos</h2>
+        <p>
+          Su cuenta ha sido bloqueada porque es menor de edad.<br>
+          No podrá acceder a la aplicación.<br>
+          Cuando cumpla 18 años, por favor póngase en contacto con soporte para activar su cuenta.
+        </p>
+      </div>
+    </div>
+
   </div>
 
   <script>
     /* ====================== INICIALIZAR FIREBASE ====================== */
     const firebaseConfig = {
-      apiKey: "AIzaSyBziV6Jvh9KQZpsh8HtCtbX51H_qKJgZzM",
-  authDomain: "ometv-67dc0.firebaseapp.com",
-  databaseURL: "https://ometv-67dc0-default-rtdb.firebaseio.com",
-  projectId: "ometv-67dc0",
-  storageBucket: "ometv-67dc0.firebasestorage.app",
-  messagingSenderId: "874118207646",
-  appId: "1:874118207646:web:0068f610484d73705ec38f",
-  measurementId: "G-NNSSK6W00L"
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_AUTH_DOMAIN",
+      databaseURL: "TU_DATABASE_URL",
+      projectId: "TU_PROJECT_ID",
+      storageBucket: "TU_STORAGE_BUCKET",
+      messagingSenderId: "TU_MESSAGING_SENDER_ID",
+      appId: "TU_APP_ID",
+      measurementId: "TU_MEASUREMENT_ID"
     };
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
@@ -625,7 +674,7 @@
       auth.createUserWithEmailAndPassword(email, password)
         .then(userCredential => {
           console.log("Registro exitoso:", userCredential.user);
-          alert("Registro exitoso, completa tu perfil");
+          alert("Registro exitoso, completa tu configuración de perfil");
           goToScreen('profileSetupScreen');
         })
         .catch(error => alert("Error al registrarse: " + error.message));
@@ -650,8 +699,11 @@
         database.ref('profiles/' + user.uid).once('value', snapshot => {
           if(snapshot.exists()){
             currentProfile = snapshot.val();
-            if(currentProfile.username && currentProfile.avatar_url && currentProfile.country){
+            if(currentProfile.username && currentProfile.avatar_url && currentProfile.country && currentProfile.birthDate){
               goToScreen('videoCallScreen');
+            } else if(!currentProfile.birthDate) {
+              // Si no se ha establecido la fecha de nacimiento, redirigir a ese slide
+              goToScreen('birthDateScreen');
             } else {
               goToScreen('profileSetupScreen');
             }
@@ -684,11 +736,29 @@
         return;
       }
       const username = document.getElementById('username').value;
-      const country = document.getElementById('country').value;
+      const country = document.getElementById('country') ? document.getElementById('country').value : "";
+      // Si ya se había seleccionado fecha de nacimiento, se guarda en currentProfile
+      const birthDate = currentProfile && currentProfile.birthDate ? currentProfile.birthDate : "";
       const avatar_url = document.getElementById('avatarPreview').src || "";
-      currentProfile = { username, country, avatar_url };
+      currentProfile = { username, country, birthDate, avatar_url };
       console.log("Actualizando perfil:", currentProfile);
       return database.ref('profiles/' + currentUser.uid).update(currentProfile);
+    }
+
+    // Se actualiza el perfil después de seleccionar fecha de nacimiento
+    function updateBirthDateAndContinue() {
+      const birthDate = document.getElementById('birthDateInput').value;
+      if (!birthDate) {
+        alert("Por favor, selecciona tu fecha de nacimiento");
+        return;
+      }
+      // Se guarda la fecha en currentProfile (aunque updateProfile la guardará)
+      currentProfile = currentProfile || {};
+      currentProfile.birthDate = birthDate;
+      // Se actualiza el perfil con la fecha y se continúa
+      updateProfile().then(() => {
+        goToScreen('countryScreen');
+      });
     }
 
     async function updateProfileAndConnect(){
@@ -701,6 +771,30 @@
         goToScreen('videoCallScreen');
       } catch(error){
         alert("Error al actualizar el perfil: " + error);
+      }
+    }
+
+    /* ====================== VALIDACIÓN DE FECHA DE NACIMIENTO ====================== */
+    function validateBirthDate() {
+      const birthDateValue = document.getElementById('birthDateInput').value;
+      if (!birthDateValue) {
+        alert("Selecciona tu fecha de nacimiento");
+        return;
+      }
+      const birthDate = new Date(birthDateValue);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if(m < 0 || (m === 0 && today.getDate() < birthDate.getDate())){
+        age--;
+      }
+      console.log("Edad calculada:", age);
+      if(age < 18){
+        // Mostrar pantalla de cuenta bloqueada
+        goToScreen('blockedScreen');
+      } else {
+        // Actualiza el perfil con la fecha y continúa
+        updateBirthDateAndContinue();
       }
     }
 
@@ -723,7 +817,7 @@
 
     /* ====================== PRESENCIA Y MATCHING ====================== */
     async function startMatching(){
-      if(!currentUser || !currentProfile || !currentProfile.username || !currentProfile.avatar_url || !currentProfile.country){
+      if(!currentUser || !currentProfile || !currentProfile.username || !currentProfile.avatar_url || !currentProfile.country || !currentProfile.birthDate){
         console.error("Perfil incompleto, no se puede marcar como online");
         return;
       }
@@ -733,6 +827,7 @@
         username: currentProfile.username,
         avatar_url: currentProfile.avatar_url,
         country: currentProfile.country,
+        birthDate: currentProfile.birthDate,
         timestamp: firebase.database.ServerValue.TIMESTAMP
       });
       userRef.onDisconnect().remove();
@@ -778,7 +873,7 @@
     async function startLocalStream(){
       try {
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        document.getElementById('localVideo').srcObject = localStream;
+        // Aunque no se muestra, se usa para la conexión
       } catch(error){
         console.error("Error accediendo a cámara y micrófono:", error);
         alert("No se pudo acceder a la cámara/micrófono. Verifica los permisos.");
