@@ -452,7 +452,6 @@
 
   <div class="container">
     <!-- PANTALLAS EXISTENTES (LOGIN, REGISTER, FORGOT, PROFILE, BIRTHDATE, COUNTRY, VIDEO CALL, BLOCKED) -->
-    <!-- (Se mantienen las mismas pantallas que antes; se omiten comentarios para resumir el código existente) -->
     <div class="screen active" id="loginScreen">
       <div class="screen-content">
         <div class="logo">
@@ -621,7 +620,7 @@
           <video id="remoteVideo" autoplay playsinline></video>
           <div class="user-info" id="remoteUserInfo">
             <img id="remoteAvatar" src="/api/placeholder/30/30" alt="User">
-            <span id="remoteName">Desconocido</span>
+            <span id="remoteName"></span>
           </div>
           <div class="connecting" id="connectingIndicator">
             <div style="text-align:center;">
@@ -710,14 +709,14 @@
   <script>
     /* ====================== INICIALIZAR FIREBASE ====================== */
     const firebaseConfig = {
-      apiKey: "AIzaSyBziV6Jvh9KQZpsh8HtCtbX51H_qKJgZzM",
-  authDomain: "ometv-67dc0.firebaseapp.com",
-  databaseURL: "https://ometv-67dc0-default-rtdb.firebaseio.com",
-  projectId: "ometv-67dc0",
-  storageBucket: "ometv-67dc0.firebasestorage.app",
-  messagingSenderId: "874118207646",
-  appId: "1:874118207646:web:0068f610484d73705ec38f",
-  measurementId: "G-NNSSK6W00L"
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_AUTH_DOMAIN",
+      databaseURL: "TU_DATABASE_URL",
+      projectId: "TU_PROJECT_ID",
+      storageBucket: "TU_STORAGE_BUCKET",
+      messagingSenderId: "TU_MESSAGING_SENDER_ID",
+      appId: "TU_APP_ID",
+      measurementId: "TU_MEASUREMENT_ID"
     };
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
@@ -1053,13 +1052,14 @@
           }
         }
       });
+      // Modificación para que si no se encuentra perfil, el nombre quede vacío en lugar de "Desconocido"
       database.ref(`calls/${callId}/participants`).once('value', snap => {
         const parts = snap.val() || {};
         let remoteUid = isCaller ? parts.callee : parts.caller;
         console.log("remoteUid detectado:", remoteUid);
         if(!remoteUid){
           console.error("No se encontró remoteUid");
-          document.getElementById('remoteName').textContent = "Desconocido";
+          document.getElementById('remoteName').textContent = "";
           document.getElementById('remoteAvatar').src = '/api/placeholder/30/30';
           return;
         }
@@ -1067,10 +1067,10 @@
           if(userSnap.exists()){
             const rProfile = userSnap.val();
             document.getElementById('remoteAvatar').src = rProfile.avatar_url || '/api/placeholder/30/30';
-            document.getElementById('remoteName').textContent = rProfile.username || 'Desconocido';
+            document.getElementById('remoteName').textContent = rProfile.username ? rProfile.username : "";
           } else {
             console.error("No se encontró perfil para remoteUid:", remoteUid);
-            document.getElementById('remoteName').textContent = "Desconocido";
+            document.getElementById('remoteName').textContent = "";
             document.getElementById('remoteAvatar').src = '/api/placeholder/30/30';
           }
         });
