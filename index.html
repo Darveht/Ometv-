@@ -48,10 +48,19 @@
       z-index: 1000;
       pointer-events: none;
     }
-    /* Icono de ajustes (settings) en esquina superior derecha */
+    /* Ícono de ajustes (settings) en esquina superior derecha */
     .settings-icon {
       position: fixed;
       top: 10px;
+      right: 10px;
+      z-index: 1100;
+      width: 40px;
+      cursor: pointer;
+    }
+    /* Ícono de reporte fijo debajo del de ajustes */
+    .report-icon {
+      position: fixed;
+      top: 60px;
       right: 10px;
       z-index: 1100;
       width: 40px;
@@ -253,7 +262,7 @@
       margin: 0;
       padding: 0;
     }
-    /* En este modo cada usuario ve sólo la cámara del otro */
+    /* Controles y swipe */
     .video-controls {
       position: absolute;
       bottom: 20px;
@@ -338,7 +347,7 @@
       opacity: 1;
       pointer-events: auto;
     }
-    /* ====================== NUEVA PANTALLA: FECHA DE NACIMIENTO ====================== */
+    /* ====================== PANTALLA DE FECHA DE NACIMIENTO ====================== */
     .birthdate-container {
       padding: 40px 20px;
     }
@@ -378,30 +387,30 @@
     .blocked-screen p {
       font-size: 18px;
     }
-    /* ====================== MODAL DE AJUSTES (SETTINGS) ====================== */
-    .modal {
+    /* ====================== MODAL DE PANTALLA COMPLETA: EDITAR PERFIL ====================== */
+    .full-screen-modal {
       display: none;
       position: fixed;
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.9);
+      background: var(--dark-bg);
       z-index: 1200;
       overflow-y: auto;
       padding: 20px;
     }
-    .modal.active {
+    .full-screen-modal.active {
       display: block;
     }
-    .modal-content {
-      background: var(--dark-bg);
+    .full-screen-content {
+      background: var(--card-bg);
       padding: 20px;
       border-radius: 8px;
       max-width: 600px;
       margin: 40px auto;
       position: relative;
     }
-    .modal-close {
+    .full-screen-close {
       position: absolute;
       top: 10px;
       right: 10px;
@@ -409,7 +418,7 @@
       cursor: pointer;
       color: var(--light-text);
     }
-    /* Estilos para el grid de fotos (6 fotos en cuadrícula 3x2) */
+    /* ====================== GRID DE FOTOS ====================== */
     .photo-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -432,7 +441,42 @@
       height: 100%;
       object-fit: cover;
     }
-    /* ====================== MODAL DE REPORTE ====================== */
+    /* ====================== MODAL DE REPORTE FULL SCREEN ====================== */
+    .report-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--dark-bg);
+      z-index: 1300;
+      overflow-y: auto;
+      padding: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+    .report-modal.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .report-content {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 600px;
+      margin: 40px auto;
+      position: relative;
+    }
+    .report-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--light-text);
+    }
     .report-options {
       text-align: left;
       margin: 20px 0;
@@ -442,16 +486,23 @@
       margin-bottom: 10px;
       font-size: 16px;
     }
+    .report-status {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
   <!-- Marca de agua -->
   <div class="watermark">BealyChat</div>
-  <!-- Icono de Ajustes en la esquina superior derecha -->
-  <img class="settings-icon" src="https://images.vexels.com/media/users/3/153359/isolated/preview/f253c46ff6fb727415fc70750ac1fb6e-configuracion-del-sistema-icono-de-trazo-de-color.png?w=360" alt="Ajustes" onclick="openSettingsModal()">
+  <!-- Ícono de Ajustes -->
+  <img class="settings-icon" src="https://images.vexels.com/media/users/3/153359/isolated/preview/f253c46ff6fb727415fc70750ac1fb6e-configuracion-del-sistema-icono-de-trazo-de-color.png?w=360" alt="Ajustes" onclick="openProfileModal()">
+  <!-- Ícono de Reporte, ubicado justo debajo del ícono de Ajustes -->
+  <img class="report-icon" src="https://cdn-icons-png.flaticon.com/512/13984/13984890.png" alt="Reportar" onclick="openReportModal()">
 
   <div class="container">
-    <!-- PANTALLAS EXISTENTES (LOGIN, REGISTER, FORGOT, PROFILE, BIRTHDATE, COUNTRY, VIDEO CALL, BLOCKED) -->
+    <!-- PANTALLAS (LOGIN, REGISTRO, RECUPERAR, PERFIL, FECHA NACIMIENTO, PAÍS, VIDEOLLAMADA, BLOQUEADO) -->
     <div class="screen active" id="loginScreen">
       <div class="screen-content">
         <div class="logo">
@@ -657,21 +708,34 @@
     </div>
   </div>
 
-  <!-- ====================== MODAL DE AJUSTES (SETTINGS) ====================== -->
-  <div class="modal" id="settingsModal">
-    <div class="modal-content">
-      <span class="modal-close" onclick="closeSettingsModal()">&times;</span>
-      <!-- Datos del perfil -->
-      <h2>Mi Perfil</h2>
-      <div id="profileInfo">
-        <img id="modalAvatar" src="/api/placeholder/100/100" alt="Avatar" style="width:100px; height:100px; border-radius:50%;"><br>
-        <strong id="modalUsername">Usuario</strong><br>
-        <span id="modalEmail">correo@ejemplo.com</span>
+  <!-- ====================== MODAL FULL SCREEN: EDITAR PERFIL ====================== -->
+  <div class="full-screen-modal" id="profileModal">
+    <div class="full-screen-content">
+      <span class="full-screen-close" onclick="closeProfileModal()">&times;</span>
+      <h2>Editar Perfil</h2>
+      <!-- Contenido de edición del perfil (puedes expandirlo según tus necesidades) -->
+      <div class="avatar-upload" onclick="document.getElementById('avatarInput').click()">
+        <input type="file" id="avatarInputProfile" style="display: none;" accept="image/*">
+        <i class="fa-solid fa-camera"></i>
+        <img id="avatarPreviewProfile" src="" alt="Avatar">
       </div>
-      <!-- Sección para subir fotos en cuadrícula -->
+      <div class="form-group">
+        <label for="usernameProfile">Nombre de usuario</label>
+        <div class="input-group">
+          <i class="fa-solid fa-user"></i>
+          <input type="text" id="usernameProfile" placeholder="Elige un nombre de usuario">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="emailProfile">Correo electrónico</label>
+        <div class="input-group">
+          <i class="fa-solid fa-envelope"></i>
+          <input type="email" id="emailProfile" placeholder="Tu correo electrónico" disabled>
+        </div>
+      </div>
+      <!-- Sección de fotos en cuadrícula -->
       <h3>Mis Fotos</h3>
       <div class="photo-grid" id="photoGrid">
-        <!-- Se generan 6 slots -->
         <div class="photo-slot" onclick="uploadPhoto(0)" id="slot0"></div>
         <div class="photo-slot" onclick="uploadPhoto(1)" id="slot1"></div>
         <div class="photo-slot" onclick="uploadPhoto(2)" id="slot2"></div>
@@ -679,44 +743,42 @@
         <div class="photo-slot" onclick="uploadPhoto(4)" id="slot4"></div>
         <div class="photo-slot" onclick="uploadPhoto(5)" id="slot5"></div>
       </div>
-      <!-- Input oculto para subir fotos (se usará para todos los slots) -->
       <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
       <br>
       <button type="button" class="btn btn-primary" onclick="savePhotos()">Guardar</button>
-      <!-- Icono de reporte dentro de Ajustes -->
       <br><br>
-      <img src="https://cdn-icons-png.flaticon.com/512/13984/13984890.png" alt="Reportar" style="width:40px; cursor:pointer;" onclick="openReportModal()">
+      <button type="button" class="btn btn-outline" onclick="updateProfileData()">Actualizar Perfil</button>
     </div>
   </div>
 
-  <!-- ====================== MODAL DE REPORTE ====================== -->
-  <div class="modal" id="reportModal">
-    <div class="modal-content">
-      <span class="modal-close" onclick="closeReportModal()">&times;</span>
+  <!-- ====================== MODAL FULL SCREEN: REPORTAR USUARIO (ESTILO MODERNO) ====================== -->
+  <div class="report-modal" id="reportModal">
+    <div class="report-content">
+      <span class="report-close" onclick="closeReportModal()">&times;</span>
       <h2>Reportar Usuario</h2>
-      <p>Seleccione las opciones que describen la infracción:</p>
+      <p>Selecciona las opciones que describen la infracción:</p>
       <div class="report-options">
         <label><input type="checkbox" value="desnudos" id="reportDesnudos"> Desnudos</label>
         <label><input type="checkbox" value="violencia_sexual" id="reportViolencia"> Violencia sexual</label>
-        <label><input type="checkbox" value="comportamiento_explicito" id="reportExplicito"> Comportamiento explícito de adultos</label>
+        <label><input type="checkbox" value="comportamiento_explicito" id="reportExplicito"> Contenido explícito</label>
         <label><input type="checkbox" value="menor_de_edad" id="reportMenor"> Posible usuario menor de edad</label>
       </div>
       <button type="button" class="btn btn-primary" onclick="submitReport()">Enviar Reporte</button>
-      <div id="reportStatus" style="margin-top:20px;"></div>
+      <div class="report-status" id="reportStatus"></div>
     </div>
   </div>
 
   <script>
     /* ====================== INICIALIZAR FIREBASE ====================== */
     const firebaseConfig = {
-      apiKey: "AIzaSyBziV6Jvh9KQZpsh8HtCtbX51H_qKJgZzM",
-  authDomain: "ometv-67dc0.firebaseapp.com",
-  databaseURL: "https://ometv-67dc0-default-rtdb.firebaseio.com",
-  projectId: "ometv-67dc0",
-  storageBucket: "ometv-67dc0.firebasestorage.app",
-  messagingSenderId: "874118207646",
-  appId: "1:874118207646:web:0068f610484d73705ec38f",
-  measurementId: "G-NNSSK6W00L"
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_AUTH_DOMAIN",
+      databaseURL: "TU_DATABASE_URL",
+      projectId: "TU_PROJECT_ID",
+      storageBucket: "TU_STORAGE_BUCKET",
+      messagingSenderId: "TU_MESSAGING_SENDER_ID",
+      appId: "TU_APP_ID",
+      measurementId: "TU_MEASUREMENT_ID"
     };
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
@@ -735,7 +797,7 @@
     let remoteStream = null;
     let peerConnection = null;
     let currentCallId = null;
-    // Array para almacenar las fotos subidas en el modal de ajustes
+    // Array para almacenar las fotos subidas en el modal de edición de perfil
     let userPhotos = [null, null, null, null, null, null];
 
     const configuration = {
@@ -878,6 +940,25 @@
       } catch(error){
         alert("Error al actualizar el perfil: " + error);
       }
+    }
+    // Función para actualizar los datos desde el modal de edición de perfil
+    function updateProfileData() {
+      const username = document.getElementById('usernameProfile').value;
+      if(username === ""){
+        alert("Ingresa un nombre de usuario");
+        return;
+      }
+      // Actualizamos el perfil en la base de datos
+      const updatedProfile = {
+        username: username,
+        avatar_url: document.getElementById('avatarPreviewProfile').src || currentProfile.avatar_url
+      };
+      database.ref('profiles/' + currentUser.uid).update(updatedProfile)
+        .then(() => {
+          alert("Perfil actualizado");
+          closeProfileModal();
+        })
+        .catch(err => alert("Error al actualizar perfil: " + err));
     }
 
     /* ====================== VALIDACIÓN DE FECHA DE NACIMIENTO ====================== */
@@ -1052,7 +1133,7 @@
           }
         }
       });
-      // Modificación para que si no se encuentra perfil, el nombre quede vacío en lugar de "Desconocido"
+      // Se asigna la información del usuario remoto; si no se encuentra perfil, el nombre queda vacío.
       database.ref(`calls/${callId}/participants`).once('value', snap => {
         const parts = snap.val() || {};
         let remoteUid = isCaller ? parts.callee : parts.caller;
@@ -1143,22 +1224,21 @@
       document.getElementById('passwordMonkeyConfirm').style.display = 'none';
     });
 
-    /* ====================== MODAL DE AJUSTES (SETTINGS) ====================== */
-    function openSettingsModal() {
-      // Actualizar datos del modal con la info del usuario
+    /* ====================== MODAL FULL SCREEN: EDITAR PERFIL ====================== */
+    function openProfileModal() {
+      // Actualizamos los datos del perfil en el modal
       if(currentUser && currentProfile) {
-        document.getElementById('modalAvatar').src = currentProfile.avatar_url || '/api/placeholder/100/100';
-        document.getElementById('modalUsername').textContent = currentProfile.username || "Usuario";
-        document.getElementById('modalEmail').textContent = currentUser.email;
+        document.getElementById('avatarPreviewProfile').src = currentProfile.avatar_url || '/api/placeholder/100/100';
+        document.getElementById('usernameProfile').value = currentProfile.username || "";
+        document.getElementById('emailProfile').value = currentUser.email;
       }
-      document.getElementById('settingsModal').classList.add('active');
+      document.getElementById('profileModal').classList.add('active');
     }
-    function closeSettingsModal() {
-      document.getElementById('settingsModal').classList.remove('active');
+    function closeProfileModal() {
+      document.getElementById('profileModal').classList.remove('active');
     }
-    // Función para subir foto en algún slot (se pasa el índice del slot)
+    // Función para subir foto en algún slot (usada tanto en edición como en ajustes)
     function uploadPhoto(slotIndex) {
-      // Guardamos el slot seleccionado globalmente y activamos el input oculto
       window.currentPhotoSlot = slotIndex;
       document.getElementById('photoInput').click();
     }
@@ -1168,7 +1248,6 @@
         const reader = new FileReader();
         reader.onload = function(e) {
           userPhotos[window.currentPhotoSlot] = e.target.result;
-          // Actualizamos el slot con la imagen
           document.getElementById('slot' + window.currentPhotoSlot).innerHTML = `<img src="${e.target.result}" alt="Foto ${window.currentPhotoSlot+1}">`;
         }
         reader.readAsDataURL(file);
@@ -1176,30 +1255,29 @@
     }
     function savePhotos() {
       if(!currentUser) return;
-      // Se guarda en la ruta "userPhotos/[uid]" un arreglo con las fotos
       database.ref('userPhotos/' + currentUser.uid).set(userPhotos)
         .then(() => {
           alert("Fotos guardadas exitosamente");
-          closeSettingsModal();
+          // Opcional: cerrar el modal de perfil si se desea
+          closeProfileModal();
         })
         .catch(err => alert("Error al guardar fotos: " + err));
     }
 
-    /* ====================== MODAL DE REPORTE ====================== */
+    /* ====================== MODAL FULL SCREEN: REPORTAR USUARIO ====================== */
     function openReportModal() {
       document.getElementById('reportModal').classList.add('active');
     }
     function closeReportModal() {
       document.getElementById('reportModal').classList.remove('active');
       document.getElementById('reportStatus').innerHTML = "";
-      // Reiniciamos las opciones
+      // Reiniciamos las opciones del reporte
       document.getElementById('reportDesnudos').checked = false;
       document.getElementById('reportViolencia').checked = false;
       document.getElementById('reportExplicito').checked = false;
       document.getElementById('reportMenor').checked = false;
     }
     function submitReport() {
-      // Recopilar las opciones seleccionadas
       const reportData = {
         desnudos: document.getElementById('reportDesnudos').checked,
         violencia_sexual: document.getElementById('reportViolencia').checked,
@@ -1208,8 +1286,6 @@
         reporter: currentUser ? currentUser.uid : "desconocido",
         timestamp: firebase.database.ServerValue.TIMESTAMP
       };
-      // Se guarda el reporte en "reports/[reportedUserUid]/[reportKey]"
-      // Para este ejemplo, se reporta al usuario con el que se está en llamada (si existe)
       let reportedUid = null;
       database.ref('calls/' + currentCallId + '/participants').once('value').then(snapshot => {
         const parts = snapshot.val();
@@ -1217,14 +1293,12 @@
           reportedUid = (parts.caller === currentUser.uid) ? parts.callee : parts.caller;
           database.ref('reports/' + reportedUid).push(reportData)
             .then(() => {
-              document.getElementById('reportStatus').innerHTML = "<p style='color:green;'>Enviado</p>";
-              // Simulamos bloqueo inmediato si se reporta alguna infracción (en producción se verificarían acumulados)
+              document.getElementById('reportStatus').innerHTML = "<p style='color:green;'>Reporte enviado</p>";
+              // Simulamos bloqueo si se reporta alguna infracción (en producción se validaría acumulado)
               if(reportData.desnudos || reportData.violencia_sexual || reportData.comportamiento_explicito || reportData.menor_de_edad) {
-                // Establecemos bloqueo por 3 días
                 const blockedUntil = new Date();
                 blockedUntil.setDate(blockedUntil.getDate() + 3);
                 database.ref('profiles/' + reportedUid).update({ blockedUntil: blockedUntil.toISOString() });
-                // Si el usuario actual es el reportado, se muestra la pantalla de bloqueo
                 if(reportedUid === currentUser.uid) {
                   setTimeout(() => { goToScreen('blockedScreen'); }, 1000);
                 }
