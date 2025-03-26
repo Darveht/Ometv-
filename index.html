@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BealyChat - Videollamadas Aleatorias</title>
+  <title>LiveVibe - Videollamadas Aleatorias</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Firebase (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app-compat.js"></script>
@@ -11,25 +11,25 @@
   <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-analytics-compat.js"></script>
   <style>
-    /* ====================== ESTILOS GENERALES ====================== */
+    /* ====================== ESTILOS MODERNOS (LINE / WEBTOON) ====================== */
     :root {
-      --primary-color: #fe2c55;
-      --secondary-color: #25f4ee;
-      --dark-bg: #121212;
-      --light-text: #ffffff;
-      --gray-text: #a7a7a7;
-      --card-bg: #1e1e1e;
+      --primary-color: #00c300;
+      --secondary-color: #ff4081;
+      --background: #f9f9f9;
+      --card-bg: #ffffff;
+      --light-text: #333333;
+      --gray-text: #888888;
     }
     html, body {
       margin: 0;
       padding: 0;
-      background-color: var(--dark-bg);
+      background-color: var(--background);
       color: var(--light-text);
       overflow-x: hidden;
     }
     * {
       box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     }
     .container {
       width: 100vw;
@@ -37,51 +37,39 @@
       position: relative;
       overflow: hidden;
     }
-    /* Marca de agua fija */
+    /* Marca de agua (solo en videollamada) */
     .watermark {
       position: fixed;
       top: 10px;
       left: 10px;
       font-size: 18px;
       font-weight: bold;
-      color: rgba(255, 255, 255, 0.7);
-      z-index: 1000;
+      color: var(--primary-color);
+      z-index: 2000;
       pointer-events: none;
+      display: none; /* Se mostrará solo en videoCallScreen */
     }
-    /* Ícono de ajustes (settings) en esquina superior derecha */
-    .settings-icon {
+    /* Íconos de ajustes y reporte */
+    .settings-icon, .report-icon {
       position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 1100;
       width: 40px;
       cursor: pointer;
-    }
-    /* Ícono de reporte fijo debajo del de ajustes */
-    .report-icon {
-      position: fixed;
-      top: 60px;
-      right: 10px;
       z-index: 1100;
-      width: 40px;
-      cursor: pointer;
     }
+    .settings-icon { top: 10px; right: 10px; }
+    .report-icon { top: 60px; right: 10px; }
     .screen {
       width: 100vw;
       height: 100vh;
       position: absolute;
       top: 0;
       left: 0;
-      background-color: var(--dark-bg);
+      background-color: var(--background);
       transition: transform 0.5s ease;
       overflow: hidden;
     }
-    .screen.active {
-      transform: translateX(0);
-    }
-    .screen:not(.active) {
-      transform: translateX(100%);
-    }
+    .screen.active { transform: translateX(0); }
+    .screen:not(.active) { transform: translateX(100%); }
     .screen-content {
       width: 100%;
       max-width: 400px;
@@ -89,10 +77,7 @@
       padding: 20px;
       text-align: center;
     }
-    .logo {
-      margin-bottom: 30px;
-      margin-top: 40px;
-    }
+    .logo { margin: 40px 0 30px; }
     .logo h1 {
       font-size: 32px;
       background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
@@ -101,40 +86,26 @@
       letter-spacing: 1px;
       margin-bottom: 8px;
     }
-    .form-group {
-      margin-bottom: 20px;
-      text-align: left;
-    }
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--gray-text);
-      font-size: 14px;
-    }
-    .input-group {
-      position: relative;
-    }
+    .logo p { font-size: 16px; margin-top: 0; }
+    .form-group { margin-bottom: 20px; text-align: left; }
+    .form-group label { display: block; margin-bottom: 8px; color: var(--gray-text); font-size: 14px; }
+    .input-group { position: relative; }
     .input-group i {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--gray-text);
+      position: absolute; left: 15px; top: 50%;
+      transform: translateY(-50%); color: var(--gray-text);
     }
     input, select {
       width: 100%;
       padding: 15px 15px 15px 45px;
       border-radius: 8px;
-      border: 1px solid #333;
+      border: 1px solid #ddd;
       background-color: var(--card-bg);
       color: var(--light-text);
       font-size: 16px;
       outline: none;
       transition: border-color 0.3s;
     }
-    input:focus, select:focus {
-      border-color: var(--primary-color);
-    }
+    input:focus, select:focus { border-color: var(--primary-color); }
     .btn {
       width: 100%;
       padding: 15px;
@@ -147,25 +118,15 @@
       text-align: center;
       margin-top: 10px;
     }
-    .btn-primary {
-      background-color: var(--primary-color);
-      color: white;
-    }
-    .btn-primary:hover {
-      opacity: 0.9;
-    }
+    .btn-primary { background-color: var(--primary-color); color: white; }
+    .btn-primary:hover { opacity: 0.9; }
     .btn-outline {
       background-color: transparent;
       border: 1px solid var(--primary-color);
       color: var(--primary-color);
     }
-    .btn-outline:hover {
-      background-color: rgba(254, 44, 85, 0.1);
-    }
-    .links {
-      margin: 20px 0;
-      text-align: center;
-    }
+    .btn-outline:hover { background-color: rgba(0, 194, 0, 0.1); }
+    .links { margin: 20px 0; text-align: center; }
     .links a {
       color: var(--secondary-color);
       text-decoration: none;
@@ -176,17 +137,8 @@
       align-items: center;
       margin: 30px 0;
     }
-    .divider::before, .divider::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background-color: #333;
-    }
-    .divider span {
-      margin: 0 15px;
-      color: var(--gray-text);
-      font-size: 14px;
-    }
+    .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background-color: #ddd; }
+    .divider span { margin: 0 15px; color: var(--gray-text); font-size: 14px; }
     .social-login {
       display: flex;
       justify-content: center;
@@ -203,13 +155,11 @@
       background-color: var(--card-bg);
       color: var(--light-text);
       font-size: 20px;
-      border: 1px solid #333;
+      border: 1px solid #ddd;
       cursor: pointer;
       transition: transform 0.3s;
     }
-    .social-btn:hover {
-      transform: scale(1.05);
-    }
+    .social-btn:hover { transform: scale(1.05); }
     .avatar-upload {
       width: 120px;
       height: 120px;
@@ -221,13 +171,10 @@
       margin: 0 auto 20px;
       position: relative;
       overflow: hidden;
-      border: 2px dashed #333;
+      border: 2px dashed #ddd;
       cursor: pointer;
     }
-    .avatar-upload i {
-      font-size: 40px;
-      color: var(--gray-text);
-    }
+    .avatar-upload i { font-size: 40px; color: var(--gray-text); }
     .avatar-upload img {
       width: 100%;
       height: 100%;
@@ -276,18 +223,16 @@
       width: 50px;
       height: 50px;
       border-radius: 25px;
-      background-color: rgba(0, 0, 0, 0.6);
+      background-color: rgba(255, 255, 255, 0.8);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
+      color: var(--light-text);
       font-size: 20px;
       cursor: pointer;
       transition: all 0.3s;
     }
-    .control-btn:hover {
-      background-color: rgba(0, 0, 0, 0.8);
-    }
+    .control-btn:hover { background-color: rgba(255, 255, 255, 1); }
     .swipe-hint {
       position: absolute;
       right: 20px;
@@ -303,28 +248,38 @@
       50% { opacity: 1; }
       100% { opacity: 0.5; }
     }
+    /* Caja de información del usuario remoto con indicador de conexión */
     .user-info {
       position: absolute;
       top: 20px;
       left: 20px;
-      background-color: rgba(0, 0, 0, 0.6);
+      background-color: rgba(255, 255, 255, 0.9);
       padding: 10px 15px;
       border-radius: 20px;
       display: flex;
       align-items: center;
       gap: 10px;
       z-index: 10;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .user-info img {
       width: 30px;
       height: 30px;
-      border-radius: 15px;
+      border-radius: 50%;
       object-fit: cover;
     }
-    .user-info span {
-      font-size: 14px;
-      font-weight: bold;
+    .user-info span { font-size: 14px; font-weight: bold; }
+    /* Indicador de conexión: Círculo al lado del nombre */
+    .connection-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: green;
+      display: inline-block;
+      margin-left: 5px;
     }
+    /* Indicador de conexión, movido hacia arriba */
     .connecting {
       position: absolute;
       top: 0; 
@@ -332,43 +287,34 @@
       width: 100%; 
       height: 100%;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
+      padding-top: 20%;
       color: #fff;
-      background: rgba(0, 0, 0, 0.7) 
-                  url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif') 
-                  center center/cover no-repeat;
+      background: rgba(0, 0, 0, 0.5) 
+                  url('https://i.pinimg.com/originals/12/bd/28/12bd28864d86f02949bd35c63c942189.gif') 
+                  center center/contain no-repeat;
       z-index: 99;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
     }
-    .connecting.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .connecting.active { opacity: 1; pointer-events: auto; }
     /* ====================== PANTALLA DE FECHA DE NACIMIENTO ====================== */
-    .birthdate-container {
-      padding: 40px 20px;
-    }
-    .birthdate-container h2 {
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
+    .birthdate-container { padding: 40px 20px; }
+    .birthdate-container h2 { font-size: 24px; margin-bottom: 20px; }
     .birthdate-container input[type="date"] {
       width: 100%;
       padding: 15px;
       border-radius: 8px;
-      border: 1px solid #333;
+      border: 1px solid #ddd;
       background-color: var(--card-bg);
       color: var(--light-text);
       font-size: 16px;
       outline: none;
       transition: border-color 0.3s;
     }
-    .birthdate-container input[type="date"]:focus {
-      border-color: var(--primary-color);
-    }
+    .birthdate-container input[type="date"]:focus { border-color: var(--primary-color); }
     /* ====================== PANTALLA DE CUENTA BLOQUEADA ====================== */
     .blocked-screen {
       display: flex;
@@ -377,31 +323,24 @@
       justify-content: center;
       text-align: center;
       padding: 20px;
-      background-color: var(--dark-bg);
+      background-color: var(--background);
       color: var(--light-text);
     }
-    .blocked-screen h2 {
-      font-size: 28px;
-      margin-bottom: 20px;
-    }
-    .blocked-screen p {
-      font-size: 18px;
-    }
-    /* ====================== MODAL DE PANTALLA COMPLETA: EDITAR PERFIL ====================== */
+    .blocked-screen h2 { font-size: 28px; margin-bottom: 20px; }
+    .blocked-screen p { font-size: 18px; }
+    /* ====================== MODAL FULL SCREEN: EDITAR PERFIL ====================== */
     .full-screen-modal {
       display: none;
       position: fixed;
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      background: var(--dark-bg);
+      background: var(--background);
       z-index: 1200;
       overflow-y: auto;
       padding: 20px;
     }
-    .full-screen-modal.active {
-      display: block;
-    }
+    .full-screen-modal.active { display: block; }
     .full-screen-content {
       background: var(--card-bg);
       padding: 20px;
@@ -409,6 +348,7 @@
       max-width: 600px;
       margin: 40px auto;
       position: relative;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     .full-screen-close {
       position: absolute;
@@ -429,7 +369,7 @@
       width: 100%;
       padding-top: 100%;
       position: relative;
-      background-color: #333;
+      background-color: #ddd;
       border-radius: 4px;
       overflow: hidden;
       cursor: pointer;
@@ -441,26 +381,21 @@
       height: 100%;
       object-fit: cover;
     }
-    /* ====================== MODAL DE REPORTE FULL SCREEN ====================== */
+    /* ====================== MODAL: REPORTAR USUARIO ====================== */
     .report-modal {
       display: none;
       position: fixed;
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      background: var(--dark-bg);
+      background: var(--background);
       z-index: 1300;
       overflow-y: auto;
       padding: 20px;
       animation: fadeIn 0.3s ease;
     }
-    .report-modal.active {
-      display: block;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
+    .report-modal.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .report-content {
       background: var(--card-bg);
       padding: 20px;
@@ -468,6 +403,7 @@
       max-width: 600px;
       margin: 40px auto;
       position: relative;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     .report-close {
       position: absolute;
@@ -491,22 +427,28 @@
       text-align: center;
       font-size: 16px;
     }
+    /* ====================== MEDIA QUERIES PARA RESPONSIVIDAD ====================== */
+    @media (max-width: 600px) {
+      .screen-content { padding: 15px; }
+      .logo h1 { font-size: 28px; }
+      .logo p { font-size: 14px; }
+      .btn { font-size: 14px; padding: 12px; }
+    }
   </style>
 </head>
 <body>
-  <!-- Marca de agua -->
-  <div class="watermark">BealyChat</div>
-  <!-- Ícono de Ajustes -->
+  <!-- La marca de agua se mostrará sólo en la pantalla de videollamada -->
+  <div class="watermark">LiveVibe</div>
+  <!-- Íconos de ajustes y reporte -->
   <img class="settings-icon" src="https://images.vexels.com/media/users/3/153359/isolated/preview/f253c46ff6fb727415fc70750ac1fb6e-configuracion-del-sistema-icono-de-trazo-de-color.png?w=360" alt="Ajustes" onclick="openProfileModal()">
-  <!-- Ícono de Reporte, ubicado justo debajo del ícono de Ajustes -->
   <img class="report-icon" src="https://cdn-icons-png.flaticon.com/512/13984/13984890.png" alt="Reportar" onclick="openReportModal()">
-
+  
   <div class="container">
-    <!-- PANTALLAS (LOGIN, REGISTRO, RECUPERAR, PERFIL, FECHA NACIMIENTO, PAÍS, VIDEOLLAMADA, BLOQUEADO) -->
+    <!-- PANTALLAS: LOGIN, REGISTRO, RECUPERAR, PERFIL, FECHA NACIMIENTO, PAÍS, VIDEOLLAMADA, BLOQUEADO -->
     <div class="screen active" id="loginScreen">
       <div class="screen-content">
         <div class="logo">
-          <h1>BealyChat</h1>
+          <h1>LiveVibe</h1>
           <p>Conecta con personas de todo el mundo</p>
         </div>
         <form id="loginForm">
@@ -540,11 +482,11 @@
         </div>
       </div>
     </div>
-
+    
     <div class="screen" id="registerScreen">
       <div class="screen-content">
         <div class="logo">
-          <h1>BealyChat</h1>
+          <h1>LiveVibe</h1>
           <p>Crea tu cuenta</p>
         </div>
         <form id="registerForm">
@@ -584,11 +526,11 @@
         </div>
       </div>
     </div>
-
+    
     <div class="screen" id="forgotPasswordScreen">
       <div class="screen-content">
         <div class="logo">
-          <h1>BealyChat</h1>
+          <h1>LiveVibe</h1>
           <p>Recupera tu contraseña</p>
         </div>
         <form id="forgotPasswordForm">
@@ -604,11 +546,11 @@
         </form>
       </div>
     </div>
-
+    
     <div class="screen" id="profileSetupScreen">
       <div class="screen-content">
         <div class="logo">
-          <h1>BealyChat</h1>
+          <h1>LiveVibe</h1>
           <p>Configura tu perfil</p>
         </div>
         <div>
@@ -624,12 +566,11 @@
               <input type="text" id="username" placeholder="Elige un nombre de usuario" required>
             </div>
           </div>
-          <!-- Continuar a la siguiente pantalla: Fecha de nacimiento -->
           <button type="button" class="btn btn-primary mt-4" onclick="goToScreen('birthDateScreen')">Continuar</button>
         </div>
       </div>
     </div>
-
+    
     <div class="screen" id="birthDateScreen">
       <div class="screen-content birthdate-container">
         <h2>Selecciona tu fecha de nacimiento</h2>
@@ -637,11 +578,11 @@
         <button type="button" class="btn btn-primary mt-4" onclick="validateBirthDate()">Continuar</button>
       </div>
     </div>
-
+    
     <div class="screen" id="countryScreen">
       <div class="screen-content">
         <div class="logo">
-          <h1>BealyChat</h1>
+          <h1>LiveVibe</h1>
           <p>Selecciona tu país</p>
         </div>
         <div>
@@ -664,7 +605,7 @@
         </div>
       </div>
     </div>
-
+    
     <div class="screen" id="videoCallScreen">
       <div class="video-container">
         <div class="remote-video" id="remoteVideoContainer">
@@ -672,6 +613,7 @@
           <div class="user-info" id="remoteUserInfo">
             <img id="remoteAvatar" src="/api/placeholder/30/30" alt="User">
             <span id="remoteName"></span>
+            <span id="connectionIndicator" class="connection-indicator"></span>
           </div>
           <div class="connecting" id="connectingIndicator">
             <div style="text-align:center;">
@@ -694,7 +636,7 @@
         <div class="swipe-hint"><i class="fa-solid fa-chevron-right"></i></div>
       </div>
     </div>
-
+    
     <div class="screen" id="blockedScreen">
       <div class="screen-content blocked-screen">
         <h2>Lo sentimos</h2>
@@ -707,13 +649,12 @@
       </div>
     </div>
   </div>
-
-  <!-- ====================== MODAL FULL SCREEN: EDITAR PERFIL ====================== -->
+  
+  <!-- MODAL FULL SCREEN: EDITAR PERFIL -->
   <div class="full-screen-modal" id="profileModal">
     <div class="full-screen-content">
       <span class="full-screen-close" onclick="closeProfileModal()">&times;</span>
       <h2>Editar Perfil</h2>
-      <!-- Contenido de edición del perfil (puedes expandirlo según tus necesidades) -->
       <div class="avatar-upload" onclick="document.getElementById('avatarInput').click()">
         <input type="file" id="avatarInputProfile" style="display: none;" accept="image/*">
         <i class="fa-solid fa-camera"></i>
@@ -733,7 +674,6 @@
           <input type="email" id="emailProfile" placeholder="Tu correo electrónico" disabled>
         </div>
       </div>
-      <!-- Sección de fotos en cuadrícula -->
       <h3>Mis Fotos</h3>
       <div class="photo-grid" id="photoGrid">
         <div class="photo-slot" onclick="uploadPhoto(0)" id="slot0"></div>
@@ -750,8 +690,8 @@
       <button type="button" class="btn btn-outline" onclick="updateProfileData()">Actualizar Perfil</button>
     </div>
   </div>
-
-  <!-- ====================== MODAL FULL SCREEN: REPORTAR USUARIO (ESTILO MODERNO) ====================== -->
+  
+  <!-- MODAL FULL SCREEN: REPORTAR USUARIO -->
   <div class="report-modal" id="reportModal">
     <div class="report-content">
       <span class="report-close" onclick="closeReportModal()">&times;</span>
@@ -767,29 +707,29 @@
       <div class="report-status" id="reportStatus"></div>
     </div>
   </div>
-
+  
   <script>
     /* ====================== INICIALIZAR FIREBASE ====================== */
     const firebaseConfig = {
       apiKey: "AIzaSyBziV6Jvh9KQZpsh8HtCtbX51H_qKJgZzM",
-  authDomain: "ometv-67dc0.firebaseapp.com",
-  databaseURL: "https://ometv-67dc0-default-rtdb.firebaseio.com",
-  projectId: "ometv-67dc0",
-  storageBucket: "ometv-67dc0.firebasestorage.app",
-  messagingSenderId: "874118207646",
-  appId: "1:874118207646:web:0068f610484d73705ec38f",
-  measurementId: "G-NNSSK6W00L"
+      authDomain: "ometv-67dc0.firebaseapp.com",
+      databaseURL: "https://ometv-67dc0-default-rtdb.firebaseio.com",
+      projectId: "ometv-67dc0",
+      storageBucket: "ometv-67dc0.firebasestorage.app",
+      messagingSenderId: "874118207646",
+      appId: "1:874118207646:web:0068f610484d73705ec38f",
+      measurementId: "G-NNSSK6W00L"
     };
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
-
+    
     const auth = firebase.auth();
     const database = firebase.database();
-
+    
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
       .then(() => console.log("Persistencia configurada"))
       .catch(error => console.error("Error configurando persistencia:", error));
-
+    
     /* ====================== VARIABLES GLOBALES ====================== */
     let currentUser = null;
     let currentProfile = null;
@@ -797,9 +737,8 @@
     let remoteStream = null;
     let peerConnection = null;
     let currentCallId = null;
-    // Array para almacenar las fotos subidas en el modal de edición de perfil
     let userPhotos = [null, null, null, null, null, null];
-
+    
     const configuration = {
       iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
@@ -810,15 +749,19 @@
         }
       ]
     };
-
+    
     /* ====================== MANEJO DE PANTALLAS ====================== */
     function goToScreen(screenId) {
       document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
       document.getElementById(screenId).classList.add('active');
+      // La marca de agua se muestra sólo en la pantalla de videollamada
       if(screenId === 'videoCallScreen'){
+        document.querySelector('.watermark').style.display = 'block';
         startLocalStream();
         showConnecting();
         startMatching();
+      } else {
+        document.querySelector('.watermark').style.display = 'none';
       }
       if(screenId === 'countryScreen'){
         autoDetectCountry();
@@ -831,7 +774,7 @@
         goToScreen('forgotPasswordScreen');
       }
     }
-
+    
     /* ====================== REGISTRO / LOGIN ====================== */
     function registerUser() {
       const email = document.getElementById('registerEmail').value;
@@ -867,7 +810,6 @@
           if(snapshot.exists()){
             currentProfile = snapshot.val();
             if(currentProfile.username && currentProfile.avatar_url && currentProfile.country && currentProfile.birthDate){
-              // Verificar si el usuario está bloqueado
               if(currentProfile.blockedUntil) {
                 const now = new Date();
                 const blockedUntil = new Date(currentProfile.blockedUntil);
@@ -889,7 +831,7 @@
         currentProfile = null;
       }
     });
-
+    
     /* ====================== PERFIL ====================== */
     document.getElementById('avatarInput').addEventListener('change', function(e){
       const file = e.target.files[0];
@@ -941,14 +883,12 @@
         alert("Error al actualizar el perfil: " + error);
       }
     }
-    // Función para actualizar los datos desde el modal de edición de perfil
     function updateProfileData() {
       const username = document.getElementById('usernameProfile').value;
       if(username === ""){
         alert("Ingresa un nombre de usuario");
         return;
       }
-      // Actualizamos el perfil en la base de datos
       const updatedProfile = {
         username: username,
         avatar_url: document.getElementById('avatarPreviewProfile').src || currentProfile.avatar_url
@@ -960,7 +900,7 @@
         })
         .catch(err => alert("Error al actualizar perfil: " + err));
     }
-
+    
     /* ====================== VALIDACIÓN DE FECHA DE NACIMIENTO ====================== */
     function validateBirthDate() {
       const birthDateValue = document.getElementById('birthDateInput').value;
@@ -982,7 +922,7 @@
         updateBirthDateAndContinue();
       }
     }
-
+    
     /* ====================== AUTO DETECTAR PAÍS ====================== */
     function autoDetectCountry(){
       fetch('https://ipapi.co/json/')
@@ -999,7 +939,7 @@
         })
         .catch(error => console.error('Error detectando país:', error));
     }
-
+    
     /* ====================== PRESENCIA Y MATCHING ====================== */
     async function startMatching(){
       if(!currentUser || !currentProfile || !currentProfile.username || !currentProfile.avatar_url || !currentProfile.country || !currentProfile.birthDate){
@@ -1048,7 +988,7 @@
         startWebRTC(callId, false);
       }
     });
-
+    
     /* ====================== WEBRTC ====================== */
     async function startLocalStream(){
       try {
@@ -1068,6 +1008,17 @@
       } else {
         console.warn("No hay stream local disponible");
       }
+      // Actualización del indicador de conexión
+      peerConnection.oniceconnectionstatechange = () => {
+        const indicator = document.getElementById('connectionIndicator');
+        if(peerConnection.iceConnectionState === "connected" || peerConnection.iceConnectionState === "completed"){
+          indicator.style.backgroundColor = "green";
+        } else if(peerConnection.iceConnectionState === "disconnected" || peerConnection.iceConnectionState === "failed"){
+          indicator.style.backgroundColor = "red";
+        } else {
+          indicator.style.backgroundColor = "orange";
+        }
+      };
       peerConnection.ontrack = (event) => {
         console.log("Evento ontrack:", event);
         const remoteVideo = document.getElementById('remoteVideo');
@@ -1133,7 +1084,6 @@
           }
         }
       });
-      // Se asigna la información del usuario remoto; si no se encuentra perfil, el nombre queda vacío.
       database.ref(`calls/${callId}/participants`).once('value', snap => {
         const parts = snap.val() || {};
         let remoteUid = isCaller ? parts.callee : parts.caller;
@@ -1223,10 +1173,9 @@
     document.getElementById('confirmPassword').addEventListener('blur', () => {
       document.getElementById('passwordMonkeyConfirm').style.display = 'none';
     });
-
-    /* ====================== MODAL FULL SCREEN: EDITAR PERFIL ====================== */
+    
+    /* ====================== MODAL: EDITAR PERFIL ====================== */
     function openProfileModal() {
-      // Actualizamos los datos del perfil en el modal
       if(currentUser && currentProfile) {
         document.getElementById('avatarPreviewProfile').src = currentProfile.avatar_url || '/api/placeholder/100/100';
         document.getElementById('usernameProfile').value = currentProfile.username || "";
@@ -1237,7 +1186,6 @@
     function closeProfileModal() {
       document.getElementById('profileModal').classList.remove('active');
     }
-    // Función para subir foto en algún slot (usada tanto en edición como en ajustes)
     function uploadPhoto(slotIndex) {
       window.currentPhotoSlot = slotIndex;
       document.getElementById('photoInput').click();
@@ -1258,20 +1206,18 @@
       database.ref('userPhotos/' + currentUser.uid).set(userPhotos)
         .then(() => {
           alert("Fotos guardadas exitosamente");
-          // Opcional: cerrar el modal de perfil si se desea
           closeProfileModal();
         })
         .catch(err => alert("Error al guardar fotos: " + err));
     }
-
-    /* ====================== MODAL FULL SCREEN: REPORTAR USUARIO ====================== */
+    
+    /* ====================== MODAL: REPORTAR USUARIO ====================== */
     function openReportModal() {
       document.getElementById('reportModal').classList.add('active');
     }
     function closeReportModal() {
       document.getElementById('reportModal').classList.remove('active');
       document.getElementById('reportStatus').innerHTML = "";
-      // Reiniciamos las opciones del reporte
       document.getElementById('reportDesnudos').checked = false;
       document.getElementById('reportViolencia').checked = false;
       document.getElementById('reportExplicito').checked = false;
@@ -1294,7 +1240,6 @@
           database.ref('reports/' + reportedUid).push(reportData)
             .then(() => {
               document.getElementById('reportStatus').innerHTML = "<p style='color:green;'>Reporte enviado</p>";
-              // Simulamos bloqueo si se reporta alguna infracción (en producción se validaría acumulado)
               if(reportData.desnudos || reportData.violencia_sexual || reportData.comportamiento_explicito || reportData.menor_de_edad) {
                 const blockedUntil = new Date();
                 blockedUntil.setDate(blockedUntil.getDate() + 3);
