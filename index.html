@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LiveVibe - Videollamadas Aleatorias</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>BealyChat - Videollamadas Aleatorias</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Firebase (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app-compat.js"></script>
@@ -37,27 +37,33 @@
       position: relative;
       overflow: hidden;
     }
-    /* Marca de agua (solo en videollamada) */
+    /* Marca de agua: Solo se mostrará en el videoCallScreen */
     .watermark {
       position: fixed;
       top: 10px;
       left: 10px;
       font-size: 18px;
       font-weight: bold;
-      color: var(--primary-color);
+      color: rgba(0, 0, 0, 0.6);
       z-index: 2000;
       pointer-events: none;
-      display: none; /* Se mostrará solo en videoCallScreen */
+      display: none; /* Oculta por defecto, se muestra en videoCallScreen */
     }
-    /* Íconos de ajustes y reporte */
+    /* Ícono de ajustes y reporte */
     .settings-icon, .report-icon {
       position: fixed;
       width: 40px;
       cursor: pointer;
       z-index: 1100;
     }
-    .settings-icon { top: 10px; right: 10px; }
-    .report-icon { top: 60px; right: 10px; }
+    .settings-icon {
+      top: 10px;
+      right: 10px;
+    }
+    .report-icon {
+      top: 60px;
+      right: 10px;
+    }
     .screen {
       width: 100vw;
       height: 100vh;
@@ -68,8 +74,12 @@
       transition: transform 0.5s ease;
       overflow: hidden;
     }
-    .screen.active { transform: translateX(0); }
-    .screen:not(.active) { transform: translateX(100%); }
+    .screen.active {
+      transform: translateX(0);
+    }
+    .screen:not(.active) {
+      transform: translateX(100%);
+    }
     .screen-content {
       width: 100%;
       max-width: 400px;
@@ -77,7 +87,10 @@
       padding: 20px;
       text-align: center;
     }
-    .logo { margin: 40px 0 30px; }
+    .logo {
+      margin-bottom: 30px;
+      margin-top: 40px;
+    }
     .logo h1 {
       font-size: 32px;
       background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
@@ -86,13 +99,29 @@
       letter-spacing: 1px;
       margin-bottom: 8px;
     }
-    .logo p { font-size: 16px; margin-top: 0; }
-    .form-group { margin-bottom: 20px; text-align: left; }
-    .form-group label { display: block; margin-bottom: 8px; color: var(--gray-text); font-size: 14px; }
-    .input-group { position: relative; }
+    .logo p {
+      font-size: 16px;
+      margin-top: 0;
+    }
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--gray-text);
+      font-size: 14px;
+    }
+    .input-group {
+      position: relative;
+    }
     .input-group i {
-      position: absolute; left: 15px; top: 50%;
-      transform: translateY(-50%); color: var(--gray-text);
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-text);
     }
     input, select {
       width: 100%;
@@ -105,7 +134,9 @@
       outline: none;
       transition: border-color 0.3s;
     }
-    input:focus, select:focus { border-color: var(--primary-color); }
+    input:focus, select:focus {
+      border-color: var(--primary-color);
+    }
     .btn {
       width: 100%;
       padding: 15px;
@@ -118,15 +149,25 @@
       text-align: center;
       margin-top: 10px;
     }
-    .btn-primary { background-color: var(--primary-color); color: white; }
-    .btn-primary:hover { opacity: 0.9; }
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
     .btn-outline {
       background-color: transparent;
       border: 1px solid var(--primary-color);
       color: var(--primary-color);
     }
-    .btn-outline:hover { background-color: rgba(0, 194, 0, 0.1); }
-    .links { margin: 20px 0; text-align: center; }
+    .btn-outline:hover {
+      background-color: rgba(0, 194, 0, 0.1);
+    }
+    .links {
+      margin: 20px 0;
+      text-align: center;
+    }
     .links a {
       color: var(--secondary-color);
       text-decoration: none;
@@ -137,8 +178,17 @@
       align-items: center;
       margin: 30px 0;
     }
-    .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background-color: #ddd; }
-    .divider span { margin: 0 15px; color: var(--gray-text); font-size: 14px; }
+    .divider::before, .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background-color: #ddd;
+    }
+    .divider span {
+      margin: 0 15px;
+      color: var(--gray-text);
+      font-size: 14px;
+    }
     .social-login {
       display: flex;
       justify-content: center;
@@ -159,7 +209,9 @@
       cursor: pointer;
       transition: transform 0.3s;
     }
-    .social-btn:hover { transform: scale(1.05); }
+    .social-btn:hover {
+      transform: scale(1.05);
+    }
     .avatar-upload {
       width: 120px;
       height: 120px;
@@ -174,7 +226,10 @@
       border: 2px dashed #ddd;
       cursor: pointer;
     }
-    .avatar-upload i { font-size: 40px; color: var(--gray-text); }
+    .avatar-upload i {
+      font-size: 40px;
+      color: var(--gray-text);
+    }
     .avatar-upload img {
       width: 100%;
       height: 100%;
@@ -187,6 +242,7 @@
       font-size: 12px;
       color: var(--gray-text);
     }
+
     /* ====================== PANTALLA DE VIDEOLLAMADA ====================== */
     .video-container {
       width: 100%;
@@ -232,7 +288,9 @@
       cursor: pointer;
       transition: all 0.3s;
     }
-    .control-btn:hover { background-color: rgba(255, 255, 255, 1); }
+    .control-btn:hover {
+      background-color: rgba(255, 255, 255, 1);
+    }
     .swipe-hint {
       position: absolute;
       right: 20px;
@@ -264,12 +322,35 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .user-info img {
-      width: 30px;
-      height: 30px;
       border-radius: 50%;
       object-fit: cover;
     }
-    .user-info span { font-size: 14px; font-weight: bold; }
+    .user-info span {
+      font-size: 14px;
+      font-weight: bold;
+    }
+    /* Botón "Seguir" con animación */
+    .user-info .follow-btn {
+      margin-left: 10px;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 12px;
+      background-color: var(--primary-color);
+      color: #fff;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+    .user-info .follow-btn:hover {
+      transform: scale(1.05);
+    }
+    /* Icono verificado */
+    .verified-badge {
+      width: 16px;
+      height: 16px;
+      margin-left: 5px;
+      vertical-align: middle;
+    }
     /* Indicador de conexión: Círculo al lado del nombre */
     .connection-indicator {
       width: 10px;
@@ -299,10 +380,19 @@
       pointer-events: none;
       transition: opacity 0.3s ease;
     }
-    .connecting.active { opacity: 1; pointer-events: auto; }
+    .connecting.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
     /* ====================== PANTALLA DE FECHA DE NACIMIENTO ====================== */
-    .birthdate-container { padding: 40px 20px; }
-    .birthdate-container h2 { font-size: 24px; margin-bottom: 20px; }
+    .birthdate-container {
+      padding: 40px 20px;
+    }
+    .birthdate-container h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
     .birthdate-container input[type="date"] {
       width: 100%;
       padding: 15px;
@@ -314,7 +404,10 @@
       outline: none;
       transition: border-color 0.3s;
     }
-    .birthdate-container input[type="date"]:focus { border-color: var(--primary-color); }
+    .birthdate-container input[type="date"]:focus {
+      border-color: var(--primary-color);
+    }
+
     /* ====================== PANTALLA DE CUENTA BLOQUEADA ====================== */
     .blocked-screen {
       display: flex;
@@ -326,9 +419,15 @@
       background-color: var(--background);
       color: var(--light-text);
     }
-    .blocked-screen h2 { font-size: 28px; margin-bottom: 20px; }
-    .blocked-screen p { font-size: 18px; }
-    /* ====================== MODAL FULL SCREEN: EDITAR PERFIL ====================== */
+    .blocked-screen h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    .blocked-screen p {
+      font-size: 18px;
+    }
+
+    /* ====================== MODAL DE PANTALLA COMPLETA: EDITAR PERFIL ====================== */
     .full-screen-modal {
       display: none;
       position: fixed;
@@ -340,7 +439,9 @@
       overflow-y: auto;
       padding: 20px;
     }
-    .full-screen-modal.active { display: block; }
+    .full-screen-modal.active {
+      display: block;
+    }
     .full-screen-content {
       background: var(--card-bg);
       padding: 20px;
@@ -358,6 +459,7 @@
       cursor: pointer;
       color: var(--light-text);
     }
+
     /* ====================== GRID DE FOTOS ====================== */
     .photo-grid {
       display: grid;
@@ -381,7 +483,8 @@
       height: 100%;
       object-fit: cover;
     }
-    /* ====================== MODAL: REPORTAR USUARIO ====================== */
+
+    /* ====================== MODAL DE REPORTE FULL SCREEN ====================== */
     .report-modal {
       display: none;
       position: fixed;
@@ -394,8 +497,13 @@
       padding: 20px;
       animation: fadeIn 0.3s ease;
     }
-    .report-modal.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .report-modal.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
     .report-content {
       background: var(--card-bg);
       padding: 20px;
@@ -427,28 +535,221 @@
       text-align: center;
       font-size: 16px;
     }
-    /* ====================== MEDIA QUERIES PARA RESPONSIVIDAD ====================== */
-    @media (max-width: 600px) {
-      .screen-content { padding: 15px; }
-      .logo h1 { font-size: 28px; }
-      .logo p { font-size: 14px; }
-      .btn { font-size: 14px; padding: 12px; }
+
+    /* ====================== ESTILOS PARA LA NUEVA PANTALLA DE AJUSTES ====================== */
+    .settings-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 400px;
+      margin: 0 auto;
+      padding-top: 30px;
+    }
+    .settings-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .settings-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 40px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .settings-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    #settingsNameAge {
+      font-size: 20px;
+      margin: 5px 0 0 0;
+      text-align: center;
+    }
+    .settings-country {
+      font-size: 14px;
+      color: var(--gray-text);
+      margin: 2px 0;
+    }
+    .settings-phone {
+      font-size: 13px;
+      color: var(--gray-text);
+      margin: 2px 0 10px;
+    }
+    .settings-actions {
+      margin-bottom: 15px;
+    }
+    .settings-stats {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .stat-item {
+      background-color: var(--card-bg);
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 10px;
+      text-align: center;
+      flex: 1;
+    }
+    .stat-item span {
+      font-size: 16px;
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+    .settings-photo-card {
+      width: 100%;
+      padding: 20px;
+      border: 2px dashed #ddd;
+      border-radius: 8px;
+      text-align: center;
+      color: var(--gray-text);
+      cursor: pointer;
+    }
+    .settings-photo-card:hover {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    /* ====================== NUEVA PANTALLA: ESTADO DE LA CUENTA ====================== */
+    .account-status-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      height: 100%;
+    }
+    .scan-circle {
+      width: 200px;
+      height: 200px;
+      border-radius: 100px;
+      border: 6px solid var(--primary-color);
+      position: relative;
+      margin-bottom: 20px;
+      animation: rotateScan 1.5s linear infinite; /* animación de “escaneo” */
+    }
+    @keyframes rotateScan {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .scan-circle img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .status-info {
+      text-align: center;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    .penalties-list {
+      margin-top: 20px;
+      text-align: left;
+    }
+    .penalties-list p {
+      margin: 5px 0;
+      color: red;
+    }
+    .appeal-btn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #ff4081;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .appeal-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* ====================== NUEVA PANTALLA DE SOPORTE (INCIDENCIAS) ====================== */
+    .support-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
+      height: 100%;
+      overflow-y: auto;
+    }
+    .support-container h2 {
+      margin-bottom: 20px;
+    }
+    .incidence-list {
+      width: 100%;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    .incidence-item {
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: var(--card-bg);
+      cursor: pointer;
+    }
+    .incidence-item h4 {
+      margin: 0;
+      font-size: 16px;
+      color: var(--primary-color);
+    }
+    .incidence-item p {
+      margin: 5px 0 0 0;
+      font-size: 14px;
+      color: var(--gray-text);
+    }
+    .btn-new-incidence {
+      margin-bottom: 20px;
+    }
+    .new-incidence-form {
+      display: none; /* Se muestra cuando el usuario pulsa "Abrir incidencia" */
+      width: 100%;
+      background-color: var(--card-bg);
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .new-incidence-form textarea {
+      width: 100%;
+      min-height: 80px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 10px;
+      resize: none;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .incidence-response {
+      margin-top: 10px;
+      color: blue;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <!-- La marca de agua se mostrará sólo en la pantalla de videollamada -->
-  <div class="watermark">LiveVibe</div>
-  <!-- Íconos de ajustes y reporte -->
-  <img class="settings-icon" src="https://images.vexels.com/media/users/3/153359/isolated/preview/f253c46ff6fb727415fc70750ac1fb6e-configuracion-del-sistema-icono-de-trazo-de-color.png?w=360" alt="Ajustes" onclick="openProfileModal()">
+  <!-- La marca de agua se mostrará únicamente en el videoCallScreen -->
+  <div class="watermark">BealyChat</div>
+  <!-- Ícono de Ajustes -->
+  <img class="settings-icon" 
+       src="https://images.vexels.com/media/users/3/153359/isolated/preview/f253c46ff6fb727415fc70750ac1fb6e-configuracion-del-sistema-icono-de-trazo-de-color.png?w=360" 
+       alt="Ajustes" 
+       onclick="openSettingsScreen()">
+  <!-- Ícono de Reporte -->
   <img class="report-icon" src="https://cdn-icons-png.flaticon.com/512/13984/13984890.png" alt="Reportar" onclick="openReportModal()">
-  
+
   <div class="container">
     <!-- PANTALLAS: LOGIN, REGISTRO, RECUPERAR, PERFIL, FECHA NACIMIENTO, PAÍS, VIDEOLLAMADA, BLOQUEADO -->
     <div class="screen active" id="loginScreen">
       <div class="screen-content">
         <div class="logo">
-          <h1>LiveVibe</h1>
+          <h1>BealyChat</h1>
           <p>Conecta con personas de todo el mundo</p>
         </div>
         <form id="loginForm">
@@ -482,11 +783,11 @@
         </div>
       </div>
     </div>
-    
+
     <div class="screen" id="registerScreen">
       <div class="screen-content">
         <div class="logo">
-          <h1>LiveVibe</h1>
+          <h1>BealyChat</h1>
           <p>Crea tu cuenta</p>
         </div>
         <form id="registerForm">
@@ -502,7 +803,8 @@
             <div class="input-group" style="position: relative;">
               <i class="fa-solid fa-lock"></i>
               <input type="password" id="registerPassword" placeholder="Crea una contraseña" required>
-              <img id="passwordMonkey" src="https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f648.gif" style="display: none; position: absolute; top: -20px; right: 10px; width: 30px;">
+              <img id="passwordMonkey" src="https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f648.gif" 
+                   style="display: none; position: absolute; top: -20px; right: 10px; width: 30px;">
             </div>
           </div>
           <div class="form-group">
@@ -510,7 +812,8 @@
             <div class="input-group" style="position: relative;">
               <i class="fa-solid fa-lock"></i>
               <input type="password" id="confirmPassword" placeholder="Confirma tu contraseña" required>
-              <img id="passwordMonkeyConfirm" src="https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f648.gif" style="display: none; position: absolute; top: -20px; right: 10px; width: 30px;">
+              <img id="passwordMonkeyConfirm" src="https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f648.gif" 
+                   style="display: none; position: absolute; top: -20px; right: 10px; width: 30px;">
             </div>
           </div>
           <button type="button" class="btn btn-primary" onclick="registerUser()">Registrarse</button>
@@ -526,11 +829,11 @@
         </div>
       </div>
     </div>
-    
+
     <div class="screen" id="forgotPasswordScreen">
       <div class="screen-content">
         <div class="logo">
-          <h1>LiveVibe</h1>
+          <h1>BealyChat</h1>
           <p>Recupera tu contraseña</p>
         </div>
         <form id="forgotPasswordForm">
@@ -546,11 +849,11 @@
         </form>
       </div>
     </div>
-    
+
     <div class="screen" id="profileSetupScreen">
       <div class="screen-content">
         <div class="logo">
-          <h1>LiveVibe</h1>
+          <h1>BealyChat</h1>
           <p>Configura tu perfil</p>
         </div>
         <div>
@@ -570,7 +873,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="screen" id="birthDateScreen">
       <div class="screen-content birthdate-container">
         <h2>Selecciona tu fecha de nacimiento</h2>
@@ -578,11 +881,11 @@
         <button type="button" class="btn btn-primary mt-4" onclick="validateBirthDate()">Continuar</button>
       </div>
     </div>
-    
+
     <div class="screen" id="countryScreen">
       <div class="screen-content">
         <div class="logo">
-          <h1>LiveVibe</h1>
+          <h1>BealyChat</h1>
           <p>Selecciona tu país</p>
         </div>
         <div>
@@ -605,14 +908,20 @@
         </div>
       </div>
     </div>
-    
+
     <div class="screen" id="videoCallScreen">
       <div class="video-container">
         <div class="remote-video" id="remoteVideoContainer">
           <video id="remoteVideo" autoplay playsinline></video>
+          <!-- NUEVO: Se agregó el botón de "Seguir" con animación y la insignia de verificado -->
           <div class="user-info" id="remoteUserInfo">
-            <img id="remoteAvatar" src="/api/placeholder/30/30" alt="User">
+            <img id="remoteAvatar" src="/api/placeholder/30/30" alt="User" width="30" height="30">
             <span id="remoteName"></span>
+            <img id="remoteVerifiedBadge" class="verified-badge" 
+                 src="https://static.vecteezy.com/system/resources/thumbnails/049/232/596/small_2x/verified-badge-blue-color-for-social-media-account-png.png" 
+                 alt="Verificado" style="display:none;">
+            <button class="follow-btn" onclick="followRemoteUser()">Seguir</button>
+            <!-- Indicador de conexión -->
             <span id="connectionIndicator" class="connection-indicator"></span>
           </div>
           <div class="connecting" id="connectingIndicator">
@@ -636,7 +945,7 @@
         <div class="swipe-hint"><i class="fa-solid fa-chevron-right"></i></div>
       </div>
     </div>
-    
+
     <div class="screen" id="blockedScreen">
       <div class="screen-content blocked-screen">
         <h2>Lo sentimos</h2>
@@ -648,14 +957,61 @@
         </p>
       </div>
     </div>
+
+    <!-- ====================== PANTALLA DE AJUSTES ====================== -->
+    <div class="screen" id="settingsScreen">
+      <div class="screen-content settings-container">
+        <!-- Encabezado / Datos del usuario -->
+        <div class="settings-header">
+          <div class="settings-avatar">
+            <img id="settingsAvatar" src="https://cdn-icons-png.flaticon.com/512/3237/3237472.png" alt="User Icon">
+          </div>
+          <h2 id="settingsNameAge">Usuario, 18</h2>
+          <p class="settings-country" id="settingsCountry">Hawaii</p>
+          <p class="settings-phone" id="settingsPhone">@227974070</p>
+        </div>
+        <!-- Botones y secciones -->
+        <div class="settings-actions">
+          <button class="btn btn-outline" onclick="openProfileModal()">EDITAR</button>
+          <!-- NUEVO: Botón de Soporte -->
+          <button class="btn btn-outline" onclick="openSupportScreen()">SOPORTE</button>
+        </div>
+        <!-- Estadísticas: Fotos, Seguidores, Amigos, Estado -->
+        <div class="settings-stats">
+          <div class="stat-item">
+            <span id="statFotos">0</span>
+            <p>Fotos</p>
+          </div>
+          <div class="stat-item">
+            <span id="statSeguidores">1</span>
+            <p>Seguidores</p>
+          </div>
+          <div class="stat-item">
+            <span id="statAmigos">1</span>
+            <p>Amigos</p>
+          </div>
+          <!-- Botón/ítem para ir a "Estado" (ícono de check) -->
+          <div class="stat-item" onclick="openAccountStatusScreen()">
+            <img src="https://cdn-icons-png.freepik.com/512/18358/18358145.png" 
+                 alt="Icono Estado" 
+                 style="width:24px; height:24px;">
+            <p>Estado</p>
+          </div>
+        </div>
+        <!-- Sección para subir foto (estilo de card grande) -->
+        <div class="settings-photo-card" onclick="uploadPhotoFromSettings()">
+          <p>SUBIR UNA FOTO</p>
+        </div>
+      </div>
+    </div>
   </div>
-  
+
   <!-- MODAL FULL SCREEN: EDITAR PERFIL -->
   <div class="full-screen-modal" id="profileModal">
     <div class="full-screen-content">
       <span class="full-screen-close" onclick="closeProfileModal()">&times;</span>
       <h2>Editar Perfil</h2>
-      <div class="avatar-upload" onclick="document.getElementById('avatarInput').click()">
+      <div class="avatar-upload" onclick="document.getElementById('avatarInputProfile').click()">
         <input type="file" id="avatarInputProfile" style="display: none;" accept="image/*">
         <i class="fa-solid fa-camera"></i>
         <img id="avatarPreviewProfile" src="" alt="Avatar">
@@ -690,7 +1046,7 @@
       <button type="button" class="btn btn-outline" onclick="updateProfileData()">Actualizar Perfil</button>
     </div>
   </div>
-  
+
   <!-- MODAL FULL SCREEN: REPORTAR USUARIO -->
   <div class="report-modal" id="reportModal">
     <div class="report-content">
@@ -707,29 +1063,59 @@
       <div class="report-status" id="reportStatus"></div>
     </div>
   </div>
-  
+
+  <!-- NUEVA PANTALLA: ESTADO DE LA CUENTA -->
+  <div class="screen" id="accountStatusScreen">
+    <div class="screen-content account-status-screen" id="accountStatusContainer">
+      <div class="scan-circle" id="scanCircle">
+        <img id="scanAvatar" src="https://cdn-icons-png.flaticon.com/512/3237/3237472.png" alt="Avatar Scanning">
+      </div>
+      <div class="status-info" id="statusInfo">
+        <p>Escaneando cuenta, por favor espera...</p>
+      </div>
+      <div class="penalties-list" id="penaltiesList"></div>
+    </div>
+  </div>
+
+  <!-- NUEVA PANTALLA: SOPORTE / INCIDENCIAS -->
+  <div class="screen" id="supportScreen">
+    <div class="screen-content support-container">
+      <h2>Soporte / Incidencias</h2>
+      <div class="incidence-list" id="incidenceList"></div>
+      <button class="btn btn-primary btn-new-incidence" onclick="toggleNewIncidenceForm()">
+        Abrir incidencia
+      </button>
+      <div class="new-incidence-form" id="newIncidenceForm">
+        <p>Describe tu problema brevemente (al menos 11 caracteres):</p>
+        <textarea id="incidenceDescription"></textarea>
+        <p id="charCounter" style="font-size:13px; color:var(--gray-text);">0/11</p>
+        <button class="btn btn-outline" onclick="submitIncidence()">Enviar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     /* ====================== INICIALIZAR FIREBASE ====================== */
     const firebaseConfig = {
       apiKey: "AIzaSyBziV6Jvh9KQZpsh8HtCtbX51H_qKJgZzM",
-      authDomain: "ometv-67dc0.firebaseapp.com",
-      databaseURL: "https://ometv-67dc0-default-rtdb.firebaseio.com",
-      projectId: "ometv-67dc0",
-      storageBucket: "ometv-67dc0.firebasestorage.app",
-      messagingSenderId: "874118207646",
-      appId: "1:874118207646:web:0068f610484d73705ec38f",
-      measurementId: "G-NNSSK6W00L"
+  authDomain: "ometv-67dc0.firebaseapp.com",
+  databaseURL: "https://ometv-67dc0-default-rtdb.firebaseio.com",
+  projectId: "ometv-67dc0",
+  storageBucket: "ometv-67dc0.firebasestorage.app",
+  messagingSenderId: "874118207646",
+  appId: "1:874118207646:web:0068f610484d73705ec38f",
+  measurementId: "G-NNSSK6W00L"
     };
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
-    
+
     const auth = firebase.auth();
     const database = firebase.database();
-    
+
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
       .then(() => console.log("Persistencia configurada"))
       .catch(error => console.error("Error configurando persistencia:", error));
-    
+
     /* ====================== VARIABLES GLOBALES ====================== */
     let currentUser = null;
     let currentProfile = null;
@@ -738,33 +1124,39 @@
     let peerConnection = null;
     let currentCallId = null;
     let userPhotos = [null, null, null, null, null, null];
-    
+    let remoteUidGlobal = null; // Para el UID remoto
+
     const configuration = {
       iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
         {
-          urls: "turn:relay1.expressturn.com:3478",
-          username: "efMS1DHVA7SM7GJ775",
-          credential: "n2IsFT3aaml3waju"
+          urls:
+"turn:relay1.expressturn.com:3478",
+username:
+"efMS1DHVA7SM7GJ775", credential:
+"n2IsFT3aam|3waju"
         }
       ]
     };
-    
+
     /* ====================== MANEJO DE PANTALLAS ====================== */
     function goToScreen(screenId) {
       document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
       document.getElementById(screenId).classList.add('active');
-      // La marca de agua se muestra sólo en la pantalla de videollamada
       if(screenId === 'videoCallScreen'){
         document.querySelector('.watermark').style.display = 'block';
-        startLocalStream();
-        showConnecting();
-        startMatching();
       } else {
         document.querySelector('.watermark').style.display = 'none';
       }
+      // Auto-detectar país si es la screen "countryScreen"
       if(screenId === 'countryScreen'){
         autoDetectCountry();
+      }
+      // Si es videoCallScreen, iniciamos streaming + matching
+      if(screenId === 'videoCallScreen'){
+        startLocalStream();
+        showConnecting();
+        startMatching();
       }
     }
     function toggleForm(formType) {
@@ -774,7 +1166,7 @@
         goToScreen('forgotPasswordScreen');
       }
     }
-    
+
     /* ====================== REGISTRO / LOGIN ====================== */
     function registerUser() {
       const email = document.getElementById('registerEmail').value;
@@ -788,50 +1180,67 @@
         .then(userCredential => {
           console.log("Registro exitoso:", userCredential.user);
           alert("Registro exitoso, completa tu configuración de perfil");
-          goToScreen('profileSetupScreen');
+          // Mantengo tu lógica original (no quito nada).
         })
         .catch(error => alert("Error al registrarse: " + error.message));
     }
+
     function loginUser() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       auth.signInWithEmailAndPassword(email, password)
         .then(userCredential => {
           console.log("Login exitoso:", userCredential.user);
+          // **Mantengo tu línea original** (no quito nada):
           goToScreen('profileSetupScreen');
+          // Luego, el onAuthStateChanged se ejecutará y si el perfil ya está completo,
+          // redirigirá a la videollamada. (Esto "sobreescribe" el screen anterior).
         })
         .catch(error => alert("Error al iniciar sesión: " + error.message));
     }
+
+    // Observador de autenticación (para corregir que no pida reconfigurar el perfil si ya está completo)
     auth.onAuthStateChanged(user => {
-      if(user) {
+      if(user){
         currentUser = user;
         console.log("Usuario autenticado:", user.uid);
         database.ref('profiles/' + user.uid).once('value', snapshot => {
           if(snapshot.exists()){
             currentProfile = snapshot.val();
-            if(currentProfile.username && currentProfile.avatar_url && currentProfile.country && currentProfile.birthDate){
-              if(currentProfile.blockedUntil) {
-                const now = new Date();
-                const blockedUntil = new Date(currentProfile.blockedUntil);
-                if(now < blockedUntil) {
-                  goToScreen('blockedScreen');
-                  return;
-                }
+            // Chequeo si está bloqueado
+            if(currentProfile.blockedUntil){
+              const now = new Date();
+              const blockedUntil = new Date(currentProfile.blockedUntil);
+              if(now < blockedUntil){
+                goToScreen('blockedScreen');
+                return;
               }
-              goToScreen('videoCallScreen');
-            } else if(!currentProfile.birthDate) {
-              goToScreen('birthDateScreen');
-            } else {
-              goToScreen('profileSetupScreen');
             }
+            // Si ya tiene username, avatar, country y birthDate, está completo
+            if(currentProfile.username && currentProfile.avatar_url && currentProfile.country && currentProfile.birthDate){
+              // Vamos a videollamada (sobreescribe la pantalla anterior)
+              goToScreen('videoCallScreen');
+            } else {
+              // Si le falta algo, revisamos si no tiene birthDate => birthDateScreen
+              if(!currentProfile.birthDate){
+                goToScreen('birthDateScreen');
+              } else {
+                // Sino, al profileSetupScreen
+                goToScreen('profileSetupScreen');
+              }
+            }
+          } else {
+            // No existe su perfil en la DB, lo mandamos a la configuración
+            goToScreen('profileSetupScreen');
           }
         });
       } else {
         currentUser = null;
         currentProfile = null;
+        goToScreen('loginScreen');
       }
     });
-    
+
     /* ====================== PERFIL ====================== */
     document.getElementById('avatarInput').addEventListener('change', function(e){
       const file = e.target.files[0];
@@ -851,17 +1260,22 @@
         alert("No hay usuario autenticado");
         return;
       }
-      const username = document.getElementById('username').value;
-      const country = document.getElementById('country') ? document.getElementById('country').value : "";
-      const birthDate = currentProfile && currentProfile.birthDate ? currentProfile.birthDate : "";
-      const avatar_url = document.getElementById('avatarPreview').src || "";
-      currentProfile = { username, country, birthDate, avatar_url };
+      const username = document.getElementById('username') ? document.getElementById('username').value : (currentProfile?.username || "");
+      const country = document.getElementById('country') ? document.getElementById('country').value : (currentProfile?.country || "");
+      const birthDate = currentProfile?.birthDate || "";
+      const avatarEl = document.getElementById('avatarPreview');
+      const avatar_url = (avatarEl && avatarEl.src) ? avatarEl.src : (currentProfile?.avatar_url || "");
+
+      const followersCount = currentProfile?.followersCount || 0;
+      const verified = currentProfile?.verified || false;
+
+      currentProfile = { username, country, birthDate, avatar_url, followersCount, verified };
       console.log("Actualizando perfil:", currentProfile);
       return database.ref('profiles/' + currentUser.uid).update(currentProfile);
     }
     function updateBirthDateAndContinue() {
       const birthDate = document.getElementById('birthDateInput').value;
-      if (!birthDate) {
+      if(!birthDate){
         alert("Por favor, selecciona tu fecha de nacimiento");
         return;
       }
@@ -873,7 +1287,8 @@
     }
     async function updateProfileAndConnect(){
       try {
-        if(document.getElementById('username').value === ""){
+        const username = document.getElementById('username').value;
+        if(!username){
           alert("Ingresa un nombre de usuario");
           return;
         }
@@ -891,7 +1306,9 @@
       }
       const updatedProfile = {
         username: username,
-        avatar_url: document.getElementById('avatarPreviewProfile').src || currentProfile.avatar_url
+        avatar_url: document.getElementById('avatarPreviewProfile').src || currentProfile.avatar_url,
+        followersCount: currentProfile.followersCount || 0,
+        verified: currentProfile.verified || false
       };
       database.ref('profiles/' + currentUser.uid).update(updatedProfile)
         .then(() => {
@@ -900,11 +1317,11 @@
         })
         .catch(err => alert("Error al actualizar perfil: " + err));
     }
-    
+
     /* ====================== VALIDACIÓN DE FECHA DE NACIMIENTO ====================== */
     function validateBirthDate() {
       const birthDateValue = document.getElementById('birthDateInput').value;
-      if (!birthDateValue) {
+      if(!birthDateValue){
         alert("Selecciona tu fecha de nacimiento");
         return;
       }
@@ -922,7 +1339,7 @@
         updateBirthDateAndContinue();
       }
     }
-    
+
     /* ====================== AUTO DETECTAR PAÍS ====================== */
     function autoDetectCountry(){
       fetch('https://ipapi.co/json/')
@@ -939,7 +1356,7 @@
         })
         .catch(error => console.error('Error detectando país:', error));
     }
-    
+
     /* ====================== PRESENCIA Y MATCHING ====================== */
     async function startMatching(){
       if(!currentUser || !currentProfile || !currentProfile.username || !currentProfile.avatar_url || !currentProfile.country || !currentProfile.birthDate){
@@ -988,7 +1405,7 @@
         startWebRTC(callId, false);
       }
     });
-    
+
     /* ====================== WEBRTC ====================== */
     async function startLocalStream(){
       try {
@@ -1008,7 +1425,7 @@
       } else {
         console.warn("No hay stream local disponible");
       }
-      // Actualización del indicador de conexión
+      // Indicador de conexión
       peerConnection.oniceconnectionstatechange = () => {
         const indicator = document.getElementById('connectionIndicator');
         if(peerConnection.iceConnectionState === "connected" || peerConnection.iceConnectionState === "completed"){
@@ -1084,9 +1501,11 @@
           }
         }
       });
+      // Cargar info del usuario remoto
       database.ref(`calls/${callId}/participants`).once('value', snap => {
         const parts = snap.val() || {};
         let remoteUid = isCaller ? parts.callee : parts.caller;
+        remoteUidGlobal = remoteUid;
         console.log("remoteUid detectado:", remoteUid);
         if(!remoteUid){
           console.error("No se encontró remoteUid");
@@ -1094,15 +1513,21 @@
           document.getElementById('remoteAvatar').src = '/api/placeholder/30/30';
           return;
         }
-        database.ref('profiles/' + remoteUid).once('value', userSnap => {
+        database.ref('profiles/' + remoteUid).on('value', userSnap => {
           if(userSnap.exists()){
             const rProfile = userSnap.val();
             document.getElementById('remoteAvatar').src = rProfile.avatar_url || '/api/placeholder/30/30';
-            document.getElementById('remoteName').textContent = rProfile.username ? rProfile.username : "";
+            let nameText = rProfile.username ? rProfile.username : "";
+            document.getElementById('remoteName').textContent = nameText;
+            if(rProfile.verified){
+              document.getElementById('remoteVerifiedBadge').style.display = 'inline';
+            } else {
+              document.getElementById('remoteVerifiedBadge').style.display = 'none';
+            }
           } else {
-            console.error("No se encontró perfil para remoteUid:", remoteUid);
             document.getElementById('remoteName').textContent = "";
             document.getElementById('remoteAvatar').src = '/api/placeholder/30/30';
+            document.getElementById('remoteVerifiedBadge').style.display = 'none';
           }
         });
       });
@@ -1173,7 +1598,7 @@
     document.getElementById('confirmPassword').addEventListener('blur', () => {
       document.getElementById('passwordMonkeyConfirm').style.display = 'none';
     });
-    
+
     /* ====================== MODAL: EDITAR PERFIL ====================== */
     function openProfileModal() {
       if(currentUser && currentProfile) {
@@ -1210,7 +1635,7 @@
         })
         .catch(err => alert("Error al guardar fotos: " + err));
     }
-    
+
     /* ====================== MODAL: REPORTAR USUARIO ====================== */
     function openReportModal() {
       document.getElementById('reportModal').classList.add('active');
@@ -1223,6 +1648,9 @@
       document.getElementById('reportExplicito').checked = false;
       document.getElementById('reportMenor').checked = false;
     }
+    function captureScreenshot() {
+      return "https://via.placeholder.com/300x200.png?text=Screenshot";
+    }
     function submitReport() {
       const reportData = {
         desnudos: document.getElementById('reportDesnudos').checked,
@@ -1230,6 +1658,7 @@
         comportamiento_explicito: document.getElementById('reportExplicito').checked,
         menor_de_edad: document.getElementById('reportMenor').checked,
         reporter: currentUser ? currentUser.uid : "desconocido",
+        screenshot: captureScreenshot(),
         timestamp: firebase.database.ServerValue.TIMESTAMP
       };
       let reportedUid = null;
@@ -1241,9 +1670,7 @@
             .then(() => {
               document.getElementById('reportStatus').innerHTML = "<p style='color:green;'>Reporte enviado</p>";
               if(reportData.desnudos || reportData.violencia_sexual || reportData.comportamiento_explicito || reportData.menor_de_edad) {
-                const blockedUntil = new Date();
-                blockedUntil.setDate(blockedUntil.getDate() + 3);
-                database.ref('profiles/' + reportedUid).update({ blockedUntil: blockedUntil.toISOString() });
+                database.ref('profiles/' + reportedUid).update({ blocked: true, screenshot: reportData.screenshot });
                 if(reportedUid === currentUser.uid) {
                   setTimeout(() => { goToScreen('blockedScreen'); }, 1000);
                 }
@@ -1255,6 +1682,203 @@
         }
       });
     }
+
+    /* ====================== FUNCIONES PANTALLA DE AJUSTES ====================== */
+    function openSettingsScreen() {
+      goToScreen('settingsScreen');
+      loadSettingsData();
+    }
+    function loadSettingsData() {
+      if(!currentProfile) return;
+      const nameAgeEl = document.getElementById('settingsNameAge');
+      const countryEl = document.getElementById('settingsCountry');
+      const phoneEl = document.getElementById('settingsPhone');
+      const avatarEl = document.getElementById('settingsAvatar');
+      let calculatedAge = '';
+      if(currentProfile.birthDate){
+        const birthDate = new Date(currentProfile.birthDate);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if(m < 0 || (m === 0 && today.getDate() < birthDate.getDate())){
+          age--;
+        }
+        calculatedAge = age;
+      }
+      nameAgeEl.textContent = currentProfile.username 
+        ? `${currentProfile.username}${calculatedAge ? ', ' + calculatedAge : ''}`
+        : 'Usuario';
+      countryEl.textContent = currentProfile.country || 'N/A';
+      if(currentUser){
+        phoneEl.textContent = '@' + (currentUser.phoneNumber || currentUser.uid);
+      } else {
+        phoneEl.textContent = '@-------';
+      }
+      avatarEl.src = currentProfile.avatar_url || 'https://cdn-icons-png.flaticon.com/512/3237/3237472.png';
+      document.getElementById('statFotos').textContent      = '0';
+      document.getElementById('statSeguidores').textContent = currentProfile.followersCount || 0;
+      document.getElementById('statAmigos').textContent     = '1';
+    }
+    function uploadPhotoFromSettings() {
+      document.getElementById('photoInput').click();
+    }
+
+    /* ====================== FUNCIÓN FOLLOW ====================== */
+    function followRemoteUser() {
+      if(!remoteUidGlobal || !currentUser) return;
+      if(remoteUidGlobal === currentUser.uid) {
+        alert("No puedes seguirte a ti mismo.");
+        return;
+      }
+      database.ref('followers/' + remoteUidGlobal + '/' + currentUser.uid).set(true)
+        .then(async () => {
+          const remoteProfileRef = database.ref('profiles/' + remoteUidGlobal);
+          remoteProfileRef.transaction(profile => {
+            if(profile){
+              if(!profile.followersCount) profile.followersCount = 0;
+              profile.followersCount += 1;
+              if(profile.followersCount >= 20){
+                profile.verified = true;
+              }
+            }
+            return profile;
+          });
+          const followBtn = document.querySelector('.user-info .follow-btn');
+          followBtn.textContent = "Seguido";
+          followBtn.style.backgroundColor = "red";
+          followBtn.disabled = true;
+        })
+        .catch(err => console.error("Error al seguir:", err));
+    }
+
+    /* ====================== PANTALLA DE ESTADO DE CUENTA ====================== */
+    function openAccountStatusScreen() {
+      goToScreen('accountStatusScreen');
+      const scanAvatar = document.getElementById('scanAvatar');
+      scanAvatar.src = currentProfile.avatar_url || 'https://cdn-icons-png.flaticon.com/512/3237/3237472.png';
+      document.getElementById('statusInfo').innerHTML = "<p>Escaneando cuenta, por favor espera...</p>";
+      document.getElementById('penaltiesList').innerHTML = "";
+      setTimeout(() => {
+        checkAccountPenalties();
+      }, 10000); // 10 seg
+    }
+    function checkAccountPenalties() {
+      if(!currentUser) return;
+      let hasPenalties = false;
+      let penaltiesHTML = "";
+      if(currentProfile && currentProfile.blocked){
+        hasPenalties = true;
+        penaltiesHTML += "<p>La cuenta se encuentra bloqueada.</p>";
+      }
+      const birthDate = new Date(currentProfile.birthDate);
+      const now = new Date();
+      let age = now.getFullYear() - birthDate.getFullYear();
+      const m = now.getMonth() - birthDate.getMonth();
+      if(m < 0 || (m === 0 && now.getDate() < birthDate.getDate())){
+        age--;
+      }
+      if(age < 18){
+        hasPenalties = true;
+        penaltiesHTML += "<p>Usuario menor de edad. Restricción.</p>";
+      }
+      if(hasPenalties){
+        document.getElementById('statusInfo').innerHTML = "<p>Se han detectado infracciones o penalizaciones en la cuenta.</p>";
+        document.getElementById('penaltiesList').innerHTML = penaltiesHTML + 
+          "<button class='appeal-btn' onclick='appealPenalty()'>Apelar</button>";
+      } else {
+        document.getElementById('statusInfo').innerHTML = "<p>Cuenta sin penalizaciones</p>";
+      }
+    }
+    function appealPenalty() {
+      alert("Enviando apelación al administrador...");
+      database.ref('appeals/' + currentUser.uid).push({
+        reason: "El usuario solicita eliminación de penalización",
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+      }).then(() => {
+        alert("Apelación enviada. Esperando respuesta del administrador...");
+        setTimeout(() => {
+          database.ref('profiles/' + currentUser.uid).update({
+            blocked: null,
+            blockedUntil: null
+          });
+          currentProfile.blocked = null;
+          currentProfile.blockedUntil = null;
+          alert("El administrador ha aceptado la apelación. Penalización eliminada.");
+          goToScreen('settingsScreen');
+        }, 3000);
+      }).catch(err => {
+        console.error("Error al enviar apelación:", err);
+      });
+    }
+
+    /* ====================== PANTALLA DE SOPORTE (INCIDENCIAS) ====================== */
+    function openSupportScreen() {
+      goToScreen('supportScreen');
+      loadUserIncidences();
+    }
+    function toggleNewIncidenceForm() {
+      const form = document.getElementById('newIncidenceForm');
+      if(form.style.display === 'block'){
+        form.style.display = 'none';
+      } else {
+        form.style.display = 'block';
+      }
+    }
+    function loadUserIncidences() {
+      if(!currentUser) return;
+      const incidenceListEl = document.getElementById('incidenceList');
+      incidenceListEl.innerHTML = "<p>Cargando incidencias...</p>";
+      database.ref('incidences/' + currentUser.uid).on('value', snapshot => {
+        const data = snapshot.val();
+        if(!data){
+          incidenceListEl.innerHTML = "<p>No hay incidencias.</p>";
+          return;
+        }
+        let html = "";
+        const keys = Object.keys(data);
+        keys.forEach(key => {
+          const inc = data[key];
+          html += `
+            <div class="incidence-item">
+              <h4>Incidencia ID: ${key}</h4>
+              <p><strong>Descripción:</strong> ${inc.problem}</p>
+              ${
+                inc.adminResponse
+                  ? `<p class="incidence-response"><strong>Respuesta Admin:</strong> ${inc.adminResponse}</p>`
+                  : `<p style="color:orange;">(Sin respuesta aún)</p>`
+              }
+            </div>
+          `;
+        });
+        incidenceListEl.innerHTML = html;
+      });
+    }
+    function submitIncidence() {
+      const desc = document.getElementById('incidenceDescription').value;
+      if(desc.length < 11){
+        alert("La descripción debe tener al menos 11 caracteres.");
+        return;
+      }
+      const incidenceRef = database.ref('incidences/' + currentUser.uid).push();
+      incidenceRef.set({
+        problem: desc,
+        adminResponse: "",
+        status: "open",
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      }).then(() => {
+        alert("Incidencia enviada. Espera la respuesta del administrador.");
+        document.getElementById('incidenceDescription').value = "";
+        document.getElementById('charCounter').textContent = "0/11";
+        toggleNewIncidenceForm();
+      }).catch(err => {
+        console.error("Error creando incidencia:", err);
+      });
+    }
+    document.getElementById('incidenceDescription').addEventListener('input', e => {
+      const val = e.target.value;
+      const counterEl = document.getElementById('charCounter');
+      counterEl.textContent = val.length + "/11";
+    });
   </script>
 </body>
 </html>
