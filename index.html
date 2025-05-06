@@ -1656,7 +1656,15 @@ username:
       }
       console.log("Edad calculada:", age);
       if(age < 18){
-        showBlockModal(3); // Bloquear por 3 días si es menor de edad
+        // En lugar de bloquear directamente, actualizamos el perfil con la restricción
+        if(currentUser) {
+          database.ref('profiles/' + currentUser.uid).update({
+            isMinor: true,
+            restrictedAccess: true
+          }).then(() => {
+            goToScreen('blockedScreen');
+          });
+        }
       } else {
         updateBirthDateAndContinue();
       }
@@ -2333,18 +2341,23 @@ username:
       document.getElementById('infractionModal').classList.add('active');
     }
 
-    function showBlockModal(days) {
-      // Solo mostrar si hay un usuario actual
-      if (!currentUser) return;
-
-      // Actualizar el perfil con el bloqueo
-      const blockEndDate = new Date();
-      blockEndDate.setDate(blockEndDate.getDate() + days);
+    function showBlockModal(days, reason) {
+      // Solo mostrar si hay un usuario actual y una razón válida
+      if (!currentUser || !reason) return;
       
-      database.ref('profiles/' + currentUser.uid).update({
-        blocked: true,
-        blockedUntil: blockEndDate.getTime()
-      }).then(() => {
+      // Verificar si el usuario ya está bloqueado
+      database.ref('profiles/' + currentUser.uid).once('value', (snapshot) => {
+        const profile = snapshot.val();
+        if (profile && profile.blocked) return; // No bloquear si ya está bloqueado
+        
+        const blockEndDate = new Date();
+        blockEndDate.setDate(blockEndDate.getDate() + days);
+        
+        database.ref('profiles/' + currentUser.uid).update({
+          blocked: true,
+          blockedUntil: blockEndDate.getTime(),
+          blockReason: reason
+        }).then(() => {
         const blockCountdownEl = document.getElementById('blockCountdown');
         const modal = document.getElementById('blockModal');
         
