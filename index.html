@@ -254,14 +254,28 @@
       overflow: hidden;
       background-color: #000;
     }
-    .remote-video {
+    .video-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+      height: 100%;
+      padding: 10px;
+    }
+    .video-container {
+      position: relative;
+      background: #000;
+      aspect-ratio: 9/16;
+      overflow: hidden;
+    }
+    .remote-video, .local-video {
       width: 100%;
       height: 100%;
       position: relative;
       background-color: #000;
       overflow: hidden;
     }
-    .remote-video video {
+    .remote-video video, .local-video video {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -1061,9 +1075,15 @@
     </div>
 
     <div class="screen" id="videoCallScreen">
-      <div class="video-container">
-        <div class="remote-video" id="remoteVideoContainer">
-          <video id="remoteVideo" autoplay playsinline></video>
+      <div class="video-grid">
+        <div class="video-container">
+          <div class="local-video">
+            <video id="localVideo" autoplay playsinline muted></video>
+          </div>
+        </div>
+        <div class="video-container">
+          <div class="remote-video" id="remoteVideoContainer">
+            <video id="remoteVideo" autoplay playsinline></video>
           <!-- NUEVO: Se agregó el botón de "Seguir" con animación y la insignia de verificado -->
           <div class="user-info" id="remoteUserInfo">
             <img id="remoteAvatar" src="/api/placeholder/30/30" alt="User" width="30" height="30">
@@ -1658,7 +1678,19 @@ username:
     /* ====================== WEBRTC ====================== */
     async function startLocalStream(){
       try {
-        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        localStream = await navigator.mediaDevices.getUserMedia({ 
+          video: true, 
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }
+        });
+        
+        // Mostrar video local
+        const localVideo = document.getElementById('localVideo');
+        localVideo.srcObject = localStream;
+        localVideo.play().catch(e => console.error("Error reproduciendo video local:", e));
       } catch(error){
         console.error("Error accediendo a cámara y micrófono:", error);
         alert("No se pudo acceder a la cámara/micrófono. Verifica los permisos.");
