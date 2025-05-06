@@ -1950,7 +1950,67 @@ username:
       event.currentTarget.classList.add('selected');
     }
 
-    function submitReport() {
+    // Sistema de puntuación de riesgo por tipo de reporte
+    const RISK_SCORES = {
+      'desnudos': 80,
+      'violencia': 90,
+      'explicito': 85,
+      'menor': 100,
+      'acoso': 70,
+      'spam': 30,
+      'suplantacion': 60,
+      'otro': 20
+    };
+
+    // Analiza el historial de reportes
+    async function analyzeReportHistory(uid) {
+      const reportsSnap = await database.ref('reports/' + uid).once('value');
+      const reports = reportsSnap.val() || {};
+      
+      let riskScore = 0;
+      let reportCount = 0;
+      let recentReports = 0;
+      const now = Date.now();
+      
+      Object.values(reports).forEach(report => {
+        reportCount++;
+        if (now - report.timestamp < 7 * 24 * 60 * 60 * 1000) { // Últimos 7 días
+          recentReports++;
+          riskScore += RISK_SCORES[report.tipo] || 0;
+        }
+      });
+
+      return {
+        totalReports: reportCount,
+        recentReports,
+        riskScore: riskScore / (recentReports || 1)
+      };
+    }
+
+    // Actualiza el estado de la cuenta basado en el análisis
+    async function updateAccountStatus(uid, riskAnalysis) {
+      const blockThreshold = 70;
+      const warningThreshold = 40;
+      
+      let accountStatus = {
+        riskLevel: riskAnalysis.riskScore,
+        lastAnalysis: firebase.database.ServerValue.TIMESTAMP
+      };
+
+      if (riskAnalysis.riskScore >= blockThreshold) {
+        accountStatus.blocked = true;
+        accountStatus.blockedUntil = Date.now() + (7 * 24 * 60 * 60 * 1000); // 7 días
+        accountStatus.blockReason = 'Multiple serious reports detected';
+      } else if (riskAnalysis.riskScore >= warningThreshold) {
+        accountStatus.warned = true;
+        accountStatus.warningTimestamp = firebase.database.ServerValue.TIMESTAMP;
+      }
+
+      await database.ref('profiles/' + uid).update(accountStatus);
+      return accountStatus;
+    }
+
+    async function submitReport() {
       if (!selectedReportOption) {
         alert('Por favor selecciona un motivo para el reporte');
         return;
@@ -1960,28 +2020,37 @@ username:
         tipo: selectedReportOption,
         reporter: currentUser ? currentUser.uid : "desconocido",
         screenshot: captureScreenshot(),
-        timestamp: firebase.database.ServerValue.TIMESTAMP
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+        riskScore: RISK_SCORES[selectedReportOption] || 0
       };
+
       let reportedUid = null;
-      database.ref('calls/' + currentCallId + '/participants').once('value').then(snapshot => {
+      try {
+        const snapshot = await database.ref('calls/' + currentCallId + '/participants').once('value');
         const parts = snapshot.val();
+        
         if(parts) {
           reportedUid = (parts.caller === currentUser.uid) ? parts.callee : parts.caller;
-          database.ref('reports/' + reportedUid).push(reportData)
-            .then(() => {
-              document.getElementById('reportStatus').innerHTML = "<p style='color:green;'>Reporte enviado</p>";
-              if(reportData.desnudos || reportData.violencia_sexual || reportData.comportamiento_explicito || reportData.menor_de_edad) {
-                database.ref('profiles/' + reportedUid).update({ blocked: true, screenshot: reportData.screenshot });
-                if(reportedUid === currentUser.uid) {
-                  setTimeout(() => { goToScreen('blockedScreen'); }, 1000);
-                }
-              }
-            })
-            .catch(err => {
-              document.getElementById('reportStatus').innerHTML = "<p style='color:red;'>Error: " + err.message + "</p>";
-            });
+          
+          // Guardar reporte
+          await database.ref('reports/' + reportedUid).push(reportData);
+          
+          // Analizar historial y actualizar estado
+          const riskAnalysis = await analyzeReportHistory(reportedUid);
+          const accountStatus = await updateAccountStatus(reportedUid, riskAnalysis);
+          
+          document.getElementById('reportStatus').innerHTML = "<p style='color:green;'>Reporte enviado y analizado</p>";
+          
+          if(accountStatus.blocked) {
+            if(reportedUid === currentUser.uid) {
+              setTimeout(() => { goToScreen('blockedScreen'); }, 1000);
+            }
+          }
         }
-      });
+      } catch(err) {
+        console.error("Error en el proceso de reporte:", err);
+        document.getElementById('reportStatus').innerHTML = "<p style='color:red;'>Error: " + err.message + "</p>";
+      }
     }
 
     /* ====================== FUNCIONES DE USUARIO ====================== */
@@ -2025,14 +2094,17 @@ username:
         checkAccountPenalties();
       }, 10000); // 10 seg
     }
-    function checkAccountPenalties() {
+    async function checkAccountPenalties() {
       if(!currentUser) return;
-      let hasPenalties = false;
-      let penaltiesHTML = "";
-      if(currentProfile && currentProfile.blocked){
-        hasPenalties = true;
-        penaltiesHTML += "<p>La cuenta se encuentra bloqueada.</p>";
-      }
+      
+      let analysisResults = {
+        penalties: [],
+        riskLevel: 0,
+        warningCount: 0,
+        recentReports: 0
+      };
+
+      // Verificar edad
       const birthDate = new Date(currentProfile.birthDate);
       const now = new Date();
       let age = now.getFullYear() - birthDate.getFullYear();
@@ -2041,16 +2113,74 @@ username:
         age--;
       }
       if(age < 18){
-        hasPenalties = true;
-        penaltiesHTML += "<p>Usuario menor de edad. Restricción.</p>";
+        analysisResults.penalties.push({
+          type: "AGE_RESTRICTION",
+          severity: "HIGH",
+          message: "Usuario menor de edad. Restricción permanente."
+        });
+        analysisResults.riskLevel += 100;
       }
-      if(hasPenalties){
-        document.getElementById('statusInfo').innerHTML = "<p>Se han detectado infracciones o penalizaciones en la cuenta.</p>";
-        document.getElementById('penaltiesList').innerHTML = penaltiesHTML + 
-          "<button class='appeal-btn' onclick='appealPenalty()'>Apelar</button>";
+
+      // Analizar reportes recientes
+      const reportAnalysis = await analyzeReportHistory(currentUser.uid);
+      analysisResults.recentReports = reportAnalysis.recentReports;
+      analysisResults.riskLevel += reportAnalysis.riskScore;
+
+      // Verificar bloqueos y advertencias
+      if(currentProfile.blocked){
+        const blockEndDate = new Date(currentProfile.blockedUntil);
+        analysisResults.penalties.push({
+          type: "ACCOUNT_BLOCKED",
+          severity: "HIGH",
+          message: `Cuenta bloqueada hasta: ${blockEndDate.toLocaleDateString()}`,
+          reason: currentProfile.blockReason || "Múltiples infracciones"
+        });
+      }
+
+      if(currentProfile.warned){
+        analysisResults.penalties.push({
+          type: "WARNING",
+          severity: "MEDIUM",
+          message: "Cuenta con advertencia activa"
+        });
+        analysisResults.warningCount++;
+      }
+
+      // Generar HTML basado en el análisis
+      let statusHTML = "";
+      let penaltiesHTML = "";
+
+      if(analysisResults.penalties.length > 0){
+        statusHTML = `
+          <p>Análisis de cuenta completado</p>
+          <p>Nivel de riesgo: ${analysisResults.riskLevel.toFixed(1)}</p>
+          <p>Reportes recientes: ${analysisResults.recentReports}</p>
+        `;
+
+        analysisResults.penalties.forEach(penalty => {
+          penaltiesHTML += `
+            <div class="penalty-item ${penalty.severity.toLowerCase()}">
+              <p><strong>${penalty.type}:</strong> ${penalty.message}</p>
+            </div>
+          `;
+        });
+
+        if(analysisResults.riskLevel >= 70){
+          penaltiesHTML += `
+            <p class="warning-text">Tu cuenta está en riesgo de ser suspendida permanentemente.</p>
+          `;
+        }
+
+        penaltiesHTML += "<button class='appeal-btn' onclick='appealPenalty()'>Apelar Penalizaciones</button>";
       } else {
-        document.getElementById('statusInfo').innerHTML = "<p>Cuenta sin penalizaciones</p>";
+        statusHTML = `
+          <p>Cuenta en buen estado</p>
+          <p>Nivel de riesgo: ${analysisResults.riskLevel.toFixed(1)}</p>
+        `;
       }
+
+      document.getElementById('statusInfo').innerHTML = statusHTML;
+      document.getElementById('penaltiesList').innerHTML = penaltiesHTML;
     }
     function appealPenalty() {
       alert("Enviando apelación al administrador...");
