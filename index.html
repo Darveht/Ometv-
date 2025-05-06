@@ -20,6 +20,8 @@
       --card-bg: #ffffff;
       --light-text: #333333;
       --gray-text: #888888;
+      --fb-blue: #1877F2; /* Added Facebook blue */
+      --fb-gray: #606770; /* Added Facebook gray */
     }
     html, body {
       margin: 0;
@@ -492,49 +494,155 @@
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      background: var(--background);
+      background: rgba(0,0,0,0.8);
       z-index: 1300;
       overflow-y: auto;
       padding: 20px;
       animation: fadeIn 0.3s ease;
     }
     .report-modal.active {
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .report-content {
       background: var(--card-bg);
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 600px;
-      margin: 40px auto;
+      padding: 24px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
       position: relative;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
     }
-    .report-close {
-      position: absolute;
-      top: 10px;
-      right: 10px;
+    .report-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .report-header h2 {
+      margin: 0;
+      color: #ff4081;
       font-size: 24px;
+    }
+    .report-close-btn {
+      background: none;
+      border: none;
+      color: var(--gray-text);
+      font-size: 20px;
       cursor: pointer;
-      color: var(--light-text);
+      padding: 8px;
+      border-radius: 50%;
+      transition: all 0.3s;
+    }
+    .report-close-btn:hover {
+      background: rgba(0,0,0,0.1);
+    }
+    .report-user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: rgba(0,0,0,0.05);
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .report-user-info img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .report-subtitle {
+      color: var(--gray-text);
+      margin-bottom: 16px;
     }
     .report-options {
-      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
       margin: 20px 0;
     }
-    .report-options label {
-      display: block;
-      margin-bottom: 10px;
+    .report-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 15px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.03);
+      transition: all 0.3s;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+    .report-option:hover {
+      background: rgba(0,0,0,0.06);
+      transform: translateX(5px);
+    }
+    .report-option.selected {
+      background: rgba(255,64,129,0.1);
+      border: 1px solid #ff4081;
+    }
+    .report-option i {
+      color: #ff4081;
+      font-size: 18px;
+    }
+    .report-option span {
       font-size: 16px;
     }
+    .report-option i {
+      color: #ff4081;
+      font-size: 18px;
+    }
+    .report-checkbox {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .report-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .btn-cancel {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid var(--gray-text);
+      background: none;
+      border-radius: 6px;
+      color: var(--gray-text);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-cancel:hover {
+      background: rgba(0,0,0,0.05);
+    }
+    .btn-report {
+      flex: 2;
+      padding: 12px;
+      border: none;
+      background: #ff4081;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-report:hover {
+      background: #ff2d6f;
+    }
     .report-status {
-      margin-top: 20px;
+      margin-top: 16px;
       text-align: center;
-      font-size: 16px;
+      font-size: 14px;
+      min-height: 20px;
     }
 
     /* ====================== ESTILOS PARA LA NUEVA PANTALLA DE AJUSTES ====================== */
@@ -682,6 +790,18 @@
     .support-container h2 {
       margin-bottom: 20px;
     }
+    .support-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .support-content {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+    }
     .incidence-list {
       width: 100%;
       margin-bottom: 20px;
@@ -707,6 +827,12 @@
     }
     .btn-new-incidence {
       margin-bottom: 20px;
+      background-color: var(--fb-blue);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
+      cursor: pointer;
     }
     .new-incidence-form {
       display: none; /* Se muestra cuando el usuario pulsa "Abrir incidencia" */
@@ -755,7 +881,7 @@
   <script>
        (adsbygoogle = window.adsbygoogle || []).push({});
   </script>
-  
+
   <div class="container">
     <!-- PANTALLAS: LOGIN, REGISTRO, RECUPERAR, PERFIL, FECHA NACIMIENTO, PAÍS, VIDEOLLAMADA, BLOQUEADO -->
     <div class="screen active" id="loginScreen">
@@ -1062,16 +1188,69 @@
   <!-- MODAL FULL SCREEN: REPORTAR USUARIO -->
   <div class="report-modal" id="reportModal">
     <div class="report-content">
-      <span class="report-close" onclick="closeReportModal()">&times;</span>
-      <h2>Reportar Usuario</h2>
-      <p>Selecciona las opciones que describen la infracción:</p>
-      <div class="report-options">
-        <label><input type="checkbox" value="desnudos" id="reportDesnudos"> Desnudos</label>
-        <label><input type="checkbox" value="violencia_sexual" id="reportViolencia"> Violencia sexual</label>
-        <label><input type="checkbox" value="comportamiento_explicito" id="reportExplicito"> Contenido explícito</label>
-        <label><input type="checkbox" value="menor_de_edad" id="reportMenor"> Posible usuario menor de edad</label>
+      <div class="report-header">
+        <h2>Reportar Usuario</h2>
+        <button class="report-close-btn" onclick="closeReportModal()">
+          <i class="fa-solid fa-times"></i>
+        </button>
       </div>
-      <button type="button" class="btn btn-primary" onclick="submitReport()">Enviar Reporte</button>
+      
+      <div class="report-user-info">
+        <img id="reportUserAvatar" src="" alt="Usuario">
+        <span id="reportUsername"></span>
+      </div>
+
+      <p class="report-subtitle">Selecciona el motivo del reporte:</p>
+      
+      <div class="report-options">
+        <div class="report-option" onclick="selectReportOption('desnudos')">
+          <i class="fa-solid fa-exclamation-triangle"></i>
+          <span>Contenido inapropiado / Desnudos</span>
+        </div>
+        
+        <div class="report-option" onclick="selectReportOption('violencia')">
+          <i class="fa-solid fa-hand-fist"></i>
+          <span>Violencia o comportamiento agresivo</span>
+        </div>
+        
+        <div class="report-option" onclick="selectReportOption('explicito')">
+          <i class="fa-solid fa-ban"></i>
+          <span>Comportamiento explícito</span>
+        </div>
+        
+        <div class="report-option" onclick="selectReportOption('menor')">
+          <i class="fa-solid fa-child"></i>
+          <span>Usuario menor de edad</span>
+        </div>
+
+        <div class="report-option" onclick="selectReportOption('acoso')">
+          <i class="fa-solid fa-angry"></i>
+          <span>Acoso o bullying</span>
+        </div>
+
+        <div class="report-option" onclick="selectReportOption('spam')">
+          <i class="fa-solid fa-robot"></i>
+          <span>Spam o contenido comercial</span>
+        </div>
+
+        <div class="report-option" onclick="selectReportOption('suplantacion')">
+          <i class="fa-solid fa-user-secret"></i>
+          <span>Suplantación de identidad</span>
+        </div>
+
+        <div class="report-option" onclick="selectReportOption('otro')">
+          <i class="fa-solid fa-flag"></i>
+          <span>Otro motivo</span>
+        </div>
+      </div>
+
+      <div class="report-actions">
+        <button type="button" class="btn-cancel" onclick="closeReportModal()">Cancelar</button>
+        <button type="button" class="btn-report" onclick="submitReport()">
+          <i class="fa-solid fa-flag"></i> Enviar Reporte
+        </button>
+      </div>
+
       <div class="report-status" id="reportStatus"></div>
     </div>
   </div>
@@ -1091,32 +1270,49 @@
 
   <!-- NUEVA PANTALLA: SOPORTE / INCIDENCIAS -->
   <div class="screen" id="supportScreen">
-    <div class="screen-content support-container">
-      <h2>Soporte / Incidencias</h2>
-      <div class="incidence-list" id="incidenceList"></div>
-      <button class="btn btn-primary btn-new-incidence" onclick="toggleNewIncidenceForm()">
-        Abrir incidencia
-      </button>
-      <div class="new-incidence-form" id="newIncidenceForm">
-        <p>Describe tu problema brevemente (al menos 11 caracteres):</p>
-        <textarea id="incidenceDescription"></textarea>
-        <p id="charCounter" style="font-size:13px; color:var(--gray-text);">0/11</p>
-        <button class="btn btn-outline" onclick="submitIncidence()">Enviar</button>
+      <div class="support-container">
+        <div class="support-header">
+          <h2>Centro de Ayuda</h2>
+          <button class="btn-outline" onclick="goToScreen('settingsScreen')" style="border:none;background:none;">
+            <i class="fa-solid fa-times" style="font-size: 24px;"></i>
+          </button>
+        </div>
+
+        <div class="support-content">
+          <div class="incidence-list" id="incidenceList"></div>
+          <button class="btn-new-incidence" onclick="toggleNewIncidenceForm()">
+            <i class="fa-solid fa-plus"></i> Nueva Consulta
+          </button>
+
+          <div class="new-incidence-form" id="newIncidenceForm" style="display:none;">
+            <h3>Crear Nueva Consulta</h3>
+            <p>Describe tu problema o pregunta (mínimo 11 caracteres)</p>
+            <textarea 
+              id="incidenceDescription" 
+              placeholder="¿En qué podemos ayudarte?"
+            ></textarea>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <p id="charCounter" style="color:var(--fb-gray);">0/11</p>
+              <button class="btn-new-incidence" onclick="submitIncidence()">
+                Enviar Consulta
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
   <script>
     /* ====================== INICIALIZAR FIREBASE ====================== */
     const firebaseConfig = {
-      apiKey: "AIzaSyBziV6Jvh9KQZpsh8HtCtbX51H_qKJgZzM",
-  authDomain: "ometv-67dc0.firebaseapp.com",
-  databaseURL: "https://ometv-67dc0-default-rtdb.firebaseio.com",
-  projectId: "ometv-67dc0",
-  storageBucket: "ometv-67dc0.firebasestorage.app",
-  messagingSenderId: "874118207646",
-  appId: "1:874118207646:web:0068f610484d73705ec38f",
-  measurementId: "G-NNSSK6W00L"
+      apiKey: "AIzaSyAAIE-9Jv6YftosuYNbdaIbAtS9ByZRxbk",
+      authDomain: "clack-828c7.firebaseapp.com",
+      databaseURL: "https://clack-828c7-default-rtdb.firebaseio.com",
+      projectId: "clack-828c7",
+      storageBucket: "clack-828c7.firebasestorage.app",
+      messagingSenderId: "254651689995",
+      appId: "1:254651689995:web:0dc857d98bb5b34c81eb0e",
+      measurementId: "G-2B8DL55NF8"
     };
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
@@ -1184,17 +1380,45 @@ username:
       const email = document.getElementById('registerEmail').value;
       const password = document.getElementById('registerPassword').value;
       const confirmPassword = document.getElementById('confirmPassword').value;
+      
+      if(!email || !password) {
+        alert("Por favor completa todos los campos");
+        return;
+      }
+      
       if(password !== confirmPassword){
         alert("Las contraseñas no coinciden");
         return;
       }
-      auth.createUserWithEmailAndPassword(email, password)
+
+      firebase.auth().createUserWithEmailAndPassword(email, password)
         .then(userCredential => {
           console.log("Registro exitoso:", userCredential.user);
           alert("Registro exitoso, completa tu configuración de perfil");
-          // Mantengo tu lógica original (no quito nada).
+          goToScreen('profileSetupScreen');
         })
-        .catch(error => alert("Error al registrarse: " + error.message));
+        .catch(error => {
+          console.error("Error de registro:", error);
+          let mensaje = "Error al registrarse";
+          switch(error.code) {
+            case 'auth/email-already-in-use':
+              mensaje = "Este correo ya está registrado";
+              break;
+            case 'auth/invalid-email':
+              mensaje = "Correo electrónico inválido";
+              break;
+            case 'auth/operation-not-allowed':
+              mensaje = "El registro por email no está habilitado";
+              break;
+            case 'auth/weak-password':
+              mensaje = "La contraseña es muy débil";
+              break;
+            case 'auth/configuration-not-found':
+              mensaje = "Error de configuración de Firebase. Por favor, inténtalo más tarde";
+              break;
+          }
+          alert(mensaje);
+        });
     }
 
     function loginUser() {
@@ -1650,7 +1874,24 @@ username:
 
     /* ====================== MODAL: REPORTAR USUARIO ====================== */
     function openReportModal() {
-      document.getElementById('reportModal').classList.add('active');
+      const modal = document.getElementById('reportModal');
+      const avatar = document.getElementById('reportUserAvatar');
+      const username = document.getElementById('reportUsername');
+      
+      // Obtener información del usuario remoto
+      if(remoteUidGlobal) {
+        database.ref('profiles/' + remoteUidGlobal).once('value')
+          .then(snapshot => {
+            const profile = snapshot.val();
+            if(profile) {
+              avatar.src = profile.avatar_url || 'https://cdn-icons-png.flaticon.com/512/3237/3237472.png';
+              username.textContent = profile.username || 'Usuario';
+            }
+          });
+      }
+      
+      modal.classList.add('active');
+      document.getElementById('reportStatus').innerHTML = "";
     }
     function closeReportModal() {
       document.getElementById('reportModal').classList.remove('active');
@@ -1663,12 +1904,24 @@ username:
     function captureScreenshot() {
       return "https://via.placeholder.com/300x200.png?text=Screenshot";
     }
+    let selectedReportOption = null;
+
+    function selectReportOption(option) {
+      selectedReportOption = option;
+      document.querySelectorAll('.report-option').forEach(opt => {
+        opt.classList.remove('selected');
+      });
+      event.currentTarget.classList.add('selected');
+    }
+
     function submitReport() {
+      if (!selectedReportOption) {
+        alert('Por favor selecciona un motivo para el reporte');
+        return;
+      }
+
       const reportData = {
-        desnudos: document.getElementById('reportDesnudos').checked,
-        violencia_sexual: document.getElementById('reportViolencia').checked,
-        comportamiento_explicito: document.getElementById('reportExplicito').checked,
-        menor_de_edad: document.getElementById('reportMenor').checked,
+        tipo: selectedReportOption,
         reporter: currentUser ? currentUser.uid : "desconocido",
         screenshot: captureScreenshot(),
         timestamp: firebase.database.ServerValue.TIMESTAMP
