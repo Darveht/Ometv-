@@ -1951,12 +1951,7 @@ username:
     }
 
     // Sistema de puntuación de riesgo por tipo de reporte
-    const vision = require('@google-cloud/vision');
-const client = new vision.ImageAnnotatorClient({
-  keyFilename: 'AIzaSyCy0DRh_QUDQkfb7edn95hOix0N33Lhsa4'
-});
-
-const RISK_SCORES = {
+    const RISK_SCORES = {
       'desnudos': 60,
       'violencia': 70,
       'explicito': 65,
@@ -2047,47 +2042,35 @@ const RISK_SCORES = {
       return accountStatus;
     }
 
-    async function submitReport() {
+    function submitReport() {
       if (!selectedReportOption) {
         alert('Por favor selecciona un motivo para el reporte');
+        return;
+      }
+
+      if (!remoteUidGlobal) {
+        alert('No se puede identificar al usuario a reportar');
         return;
       }
 
       const reportData = {
         tipo: selectedReportOption,
         reporter: currentUser ? currentUser.uid : "desconocido",
-        screenshot: captureScreenshot(),
         timestamp: firebase.database.ServerValue.TIMESTAMP,
         riskScore: RISK_SCORES[selectedReportOption] || 0
       };
 
-      let reportedUid = null;
-      try {
-        const snapshot = await database.ref('calls/' + currentCallId + '/participants').once('value');
-        const parts = snapshot.val();
-        
-        if(parts) {
-          reportedUid = (parts.caller === currentUser.uid) ? parts.callee : parts.caller;
-          
-          // Guardar reporte
-          await database.ref('reports/' + reportedUid).push(reportData);
-          
-          // Analizar historial y actualizar estado
-          const riskAnalysis = await analyzeReportHistory(reportedUid);
-          const accountStatus = await updateAccountStatus(reportedUid, riskAnalysis);
-          
-          document.getElementById('reportStatus').innerHTML = "<p style='color:green;'>Reporte enviado y analizado</p>";
-          
-          if(accountStatus.blocked) {
-            if(reportedUid === currentUser.uid) {
-              setTimeout(() => { goToScreen('blockedScreen'); }, 1000);
-            }
-          }
-        }
-      } catch(err) {
-        console.error("Error en el proceso de reporte:", err);
-        document.getElementById('reportStatus').innerHTML = "<p style='color:red;'>Error: " + err.message + "</p>";
-      }
+      database.ref('reports/' + remoteUidGlobal).push(reportData)
+        .then(() => {
+          document.getElementById('reportStatus').innerHTML = "<p style='color:green;'>Reporte enviado correctamente</p>";
+          setTimeout(() => {
+            closeReportModal();
+          }, 2000);
+        })
+        .catch(err => {
+          console.error("Error en el reporte:", err);
+          document.getElementById('reportStatus').innerHTML = "<p style='color:red;'>Error al enviar el reporte</p>";
+        });
     }
 
     /* ====================== FUNCIONES DE USUARIO ====================== */
