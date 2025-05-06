@@ -1530,11 +1530,11 @@ username:
           if(snapshot.exists()){
             currentProfile = snapshot.val();
             // Chequeo si está bloqueado
-            if(currentProfile.blockedUntil){
+            if(currentProfile.blockedUntil && !document.getElementById('loginScreen').classList.contains('active')){
               const now = new Date();
               const blockedUntil = new Date(currentProfile.blockedUntil);
               if(now < blockedUntil){
-                showBlockModal(Math.ceil((blockedUntil.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+                goToScreen('blockedScreen');
                 return;
               }
             }
@@ -2342,13 +2342,18 @@ username:
     }
 
     function showBlockModal(days, reason) {
-      // Solo mostrar si hay un usuario actual y una razón válida
-      if (!currentUser || !reason) return;
+      // No mostrar si no hay usuario o estamos en la página de inicio
+      if (!currentUser || document.getElementById('loginScreen').classList.contains('active')) {
+        return;
+      }
       
-      // Verificar si el usuario ya está bloqueado
       database.ref('profiles/' + currentUser.uid).once('value', (snapshot) => {
         const profile = snapshot.val();
-        if (profile && profile.blocked) return; // No bloquear si ya está bloqueado
+        
+        // Solo mostrar si el usuario está realmente bloqueado
+        if (!profile || !profile.blocked) {
+          return;
+        }
         
         const blockEndDate = new Date();
         blockEndDate.setDate(blockEndDate.getDate() + days);
