@@ -52,19 +52,13 @@
       pointer-events: none;
       display: none; /* Oculta por defecto, se muestra en videoCallScreen */
     }
-    /* Ícono de ajustes y reporte */
-    .settings-icon, .report-icon {
+    /* Ícono de reporte */
+    .report-icon {
       position: fixed;
       width: 40px;
       cursor: pointer;
       z-index: 1100;
-    }
-    .settings-icon {
       top: 10px;
-      right: 10px;
-    }
-    .report-icon {
-      top: 60px;
       right: 10px;
     }
     .screen {
@@ -936,13 +930,9 @@
 <body>
   <!-- La marca de agua se mostrará únicamente en el videoCallScreen -->
   <div class="watermark">BealyChat</div>
-  <!-- Ícono de Ajustes -->
-  <img class="settings-icon" 
-       src="https://images.vexels.com/media/users/3/153359/isolated/preview/f253c46ff6fb727415fc70750ac1fb6e-configuracion-del-sistema-icono-de-trazo-de-color.png?w=360" 
-       alt="Ajustes" 
-       onclick="openSettingsScreen()">
   <!-- Ícono de Reporte -->
-  <img class="report-icon" src="https://cdn-icons-png.flaticon.com/512/13984/13984890.png" alt="Reportar" onclick="openReportModal()">
+  <img class="report-icon" src="https://cdn-icons-png.flaticon.com/512/13984/13984890.png" alt="Reportar" onclick="openReportModal()"
+       style="display: block;">
 
   <!-- Google AdSense Ad Unit -->
   <ins class="adsbygoogle"
@@ -1171,52 +1161,7 @@
       </div>
     </div>
 
-    <!-- ====================== PANTALLA DE AJUSTES ====================== -->
-    <div class="screen" id="settingsScreen">
-      <div class="screen-content settings-container">
-        <!-- Encabezado / Datos del usuario -->
-        <div class="settings-header">
-          <div class="settings-avatar">
-            <img id="settingsAvatar" src="https://cdn-icons-png.flaticon.com/512/3237/3237472.png" alt="User Icon">
-          </div>
-          <h2 id="settingsNameAge">Usuario, 18</h2>
-          <p class="settings-country" id="settingsCountry">Hawaii</p>
-          <p class="settings-phone" id="settingsPhone">@227974070</p>
-        </div>
-        <!-- Botones y secciones -->
-        <div class="settings-actions">
-          <button class="btn btn-outline" onclick="openProfileModal()">EDITAR</button>
-          <!-- NUEVO: Botón de Soporte -->
-          <button class="btn btn-outline" onclick="openSupportScreen()">SOPORTE</button>
-        </div>
-        <!-- Estadísticas: Fotos, Seguidores, Amigos, Estado -->
-        <div class="settings-stats">
-          <div class="stat-item">
-            <span id="statFotos">0</span>
-            <p>Fotos</p>
-          </div>
-          <div class="stat-item">
-            <span id="statSeguidores">1</span>
-            <p>Seguidores</p>
-          </div>
-          <div class="stat-item">
-            <span id="statAmigos">1</span>
-            <p>Amigos</p>
-          </div>
-          <!-- Botón/ítem para ir a "Estado" (ícono de check) -->
-          <div class="stat-item" onclick="openAccountStatusScreen()">
-            <img src="https://cdn-icons-png.freepik.com/512/18358/18358145.png" 
-                 alt="Icono Estado" 
-                 style="width:24px; height:24px;">
-            <p>Estado</p>
-          </div>
-        </div>
-        <!-- Sección para subir foto (estilo de card grande) -->
-        <div class="settings-photo-card" onclick="uploadPhotoFromSettings()">
-          <p>SUBIR UNA FOTO</p>
-        </div>
-      </div>
-    </div>
+    
   </div>
 
   <!-- MODAL FULL SCREEN: EDITAR PERFIL -->
@@ -2025,45 +1970,7 @@ username:
       });
     }
 
-    /* ====================== FUNCIONES PANTALLA DE AJUSTES ====================== */
-    function openSettingsScreen() {
-      goToScreen('settingsScreen');
-      loadSettingsData();
-    }
-    function loadSettingsData() {
-      if(!currentProfile) return;
-      const nameAgeEl = document.getElementById('settingsNameAge');
-      const countryEl = document.getElementById('settingsCountry');
-      const phoneEl = document.getElementById('settingsPhone');
-      const avatarEl = document.getElementById('settingsAvatar');
-      let calculatedAge = '';
-      if(currentProfile.birthDate){
-        const birthDate = new Date(currentProfile.birthDate);
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const m = today.getMonth() - birthDate.getMonth();
-        if(m < 0 || (m === 0 && today.getDate() < birthDate.getDate())){
-          age--;
-        }
-        calculatedAge = age;
-      }
-      nameAgeEl.textContent = currentProfile.username 
-        ? `${currentProfile.username}${calculatedAge ? ', ' + calculatedAge : ''}`
-        : 'Usuario';
-      countryEl.textContent = currentProfile.country || 'N/A';
-      if(currentUser){
-        phoneEl.textContent = '@' + (currentUser.phoneNumber || currentUser.uid);
-      } else {
-        phoneEl.textContent = '@-------';
-      }
-      avatarEl.src = currentProfile.avatar_url || 'https://cdn-icons-png.flaticon.com/512/3237/3237472.png';
-      document.getElementById('statFotos').textContent      = '0';
-      document.getElementById('statSeguidores').textContent = currentProfile.followersCount || 0;
-      document.getElementById('statAmigos').textContent     = '1';
-    }
-    function uploadPhotoFromSettings() {
-      document.getElementById('photoInput').click();
-    }
+    /* ====================== FUNCIONES DE USUARIO ====================== */
 
     /* ====================== FUNCIÓN FOLLOW ====================== */
     function followRemoteUser() {
