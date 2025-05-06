@@ -61,11 +61,11 @@
       z-index: 1100;
       right: 10px;
     }
-    
+
     .account-status-icon {
       top: 10px;
     }
-    
+
     .report-icon {
       top: 60px;
     }
@@ -712,7 +712,7 @@
     .btn-report:hover {
       background: #ff2d6f;
     }
-    
+
     .report-status {
       margin-top: 16px;
       text-align: center;
@@ -918,8 +918,7 @@
       padding: 15px;
       margin-bottom: 20px;
     }
-    .new-incidence-form textarea {
-      width: 100%;
+    .new-incidence-form textarea {      width: 100%;
       min-height: 80px;
       border: 1px solid #ddd;
       border-radius: 6px;
@@ -932,6 +931,51 @@
       margin-top: 10px;
       color: blue;
       font-size: 14px;
+    }
+    /* Estilos para los modales de sistema */
+    .system-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1400;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s ease;
+    }
+    .system-modal.active {
+      display: flex;
+    }
+    .system-modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      max-width: 400px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .system-modal-content h2 {
+      margin-bottom: 15px;
+    }
+    .system-modal-content p {
+      margin-bottom: 10px;
+    }
+    .system-modal-content button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .countdown {
+      font-size: 18px;
+      margin: 10px 0;
     }
   </style>
 </head>
@@ -1159,7 +1203,7 @@
             <i class="fa-solid fa-arrows-rotate"></i>
           </div>
         </div>
-        
+
       </div>
     </div>
 
@@ -1175,7 +1219,7 @@
       </div>
     </div>
 
-    
+
   </div>
 
   <!-- MODAL FULL SCREEN: EDITAR PERFIL -->
@@ -1289,20 +1333,28 @@
     </div>
   </div>
 
-  <!-- NUEVA PANTALLA: ESTADO DE LA CUENTA -->
-  <div class="screen" id="accountStatusScreen">
-    <div class="screen-content account-status-screen" id="accountStatusContainer">
-      <div class="scan-circle" id="scanCircle">
-        <img id="scanAvatar" src="https://cdn-icons-png.flaticon.com/512/3237/3237472.png" alt="Avatar Scanning">
-      </div>
-      <div class="status-info" id="statusInfo">
-        <p>Escaneando cuenta, por favor espera...</p>
-      </div>
-      <div class="penalties-list" id="penaltiesList"></div>
+  <!-- MODALES DE SISTEMA -->
+  <div class="system-modal" id="infractionModal">
+    <div class="system-modal-content">
+      <h2>⚠️ Infracción Detectada</h2>
+      <p id="infractionMessage"></p>
+      <p>El sistema ha detectado comportamiento inapropiado en tu cuenta.</p>
+      <button class="appeal-btn" onclick="appealInfraction()">Apelar Infracción</button>
     </div>
   </div>
 
-  <!-- NUEVA PANTALLA: SOPORTE / INCIDENCIAS -->
+  <div class="system-modal" id="blockModal">
+    <div class="system-modal-content">
+      <h2>🚫 Cuenta Bloqueada</h2>
+      <p>Tu cuenta ha sido bloqueada temporalmente debido a múltiples infracciones.</p>
+      <p>Por favor, espera el tiempo indicado para volver a acceder:</p>
+      <div class="countdown" id="blockCountdown"></div>
+      <p>Si crees que esto es un error, puedes intentar apelar.</p>
+      <button class="appeal-btn" onclick="appealBlock()">Apelar Bloqueo</button>
+    </div>
+  </div>
+
+  <!-- NUEVA PANTALLA: SOPORTE (INCIDENCIAS) -->
   <div class="screen" id="supportScreen">
       <div class="support-container">
         <div class="support-header">
@@ -1482,7 +1534,7 @@ username:
               const now = new Date();
               const blockedUntil = new Date(currentProfile.blockedUntil);
               if(now < blockedUntil){
-                goToScreen('blockedScreen');
+                showBlockModal(Math.ceil((blockedUntil.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
                 return;
               }
             }
@@ -1604,7 +1656,7 @@ username:
       }
       console.log("Edad calculada:", age);
       if(age < 18){
-        goToScreen('blockedScreen');
+        showBlockModal(3); // Bloquear por 3 días si es menor de edad
       } else {
         updateBirthDateAndContinue();
       }
@@ -1687,7 +1739,7 @@ username:
             autoGainControl: true
           }
         });
-        
+
         // Mostrar video local
         const localVideo = document.getElementById('localVideo');
         localVideo.srcObject = localStream;
@@ -1857,7 +1909,7 @@ username:
         findRandomUser();
       }, 2000);
     }
-    
+
     document.getElementById('registerPassword').addEventListener('focus', () => {
       document.getElementById('passwordMonkey').style.display = 'block';
     });
@@ -1966,12 +2018,12 @@ username:
     async function analyzeReportHistory(uid) {
       const reportsSnap = await database.ref('reports/' + uid).once('value');
       const reports = reportsSnap.val() || {};
-      
+
       let riskScore = 0;
       let reportCount = 0;
       let recentReports = 0;
       const now = Date.now();
-      
+
       Object.values(reports).forEach(report => {
         reportCount++;
         if (now - report.timestamp < 7 * 24 * 60 * 60 * 1000) { // Últimos 7 días
@@ -1991,7 +2043,7 @@ username:
     async function updateAccountStatus(uid, riskAnalysis) {
       const blockThreshold = 70;
       const warningThreshold = 40;
-      
+
       let accountStatus = {
         riskLevel: riskAnalysis.riskScore,
         lastAnalysis: firebase.database.ServerValue.TIMESTAMP
@@ -2028,22 +2080,24 @@ username:
       try {
         const snapshot = await database.ref('calls/' + currentCallId + '/participants').once('value');
         const parts = snapshot.val();
-        
+
         if(parts) {
           reportedUid = (parts.caller === currentUser.uid) ? parts.callee : parts.caller;
-          
+
           // Guardar reporte
           await database.ref('reports/' + reportedUid).push(reportData);
-          
+
           // Analizar historial y actualizar estado
           const riskAnalysis = await analyzeReportHistory(reportedUid);
           const accountStatus = await updateAccountStatus(reportedUid, riskAnalysis);
-          
+
           document.getElementById('reportStatus').innerHTML = "<p style='color:green;'>Reporte enviado y analizado</p>";
-          
-          if(accountStatus.blocked) {
-            if(reportedUid === currentUser.uid) {
-              setTimeout(() => { goToScreen('blockedScreen'); }, 1000);
+
+          if (reportedUid === currentUser.uid) {
+            if (accountStatus.blocked) {
+              showBlockModal(8);
+            } else if (accountStatus.warned) {
+              showInfractionModal("Se ha detectado comportamiento inapropiado en tu cuenta. Esta es una advertencia.");
             }
           }
         }
@@ -2096,7 +2150,7 @@ username:
     }
     async function checkAccountPenalties() {
       if(!currentUser) return;
-      
+
       let analysisResults = {
         penalties: [],
         riskLevel: 0,
@@ -2272,6 +2326,47 @@ username:
       const counterEl = document.getElementById('charCounter');
       counterEl.textContent = val.length + "/11";
     });
+
+    // Funciones para los modales de sistema
+    function showInfractionModal(message) {
+      document.getElementById('infractionMessage').textContent = message;
+      document.getElementById('infractionModal').classList.add('active');
+    }
+
+    function showBlockModal(days) {
+      const blockCountdownEl = document.getElementById('blockCountdown');
+      let countDownDate = new Date();
+      countDownDate.setDate(countDownDate.getDate() + days);
+      const x = setInterval(function() {
+        let now = new Date().getTime();
+        let t = countDownDate - now;
+        let days = Math.floor(t / (1000 * 60 * 60 * 24));
+        let hours = Math.floor((t % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        let minutes = Math.floor((t % (1000 * 60 * 60)) / (1000 * 60));
+        let seconds = Math.floor((t % (1000 * 60)) / 1000);
+        blockCountdownEl.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+        if (t < 0) {
+          clearInterval(x);
+          blockCountdownEl.innerHTML = "Bloqueo finalizado";
+          database.ref('profiles/' + currentUser.uid).update({ blocked: false, blockedUntil: null });
+        }
+      }, 1000);
+      document.getElementById('blockModal').classList.add('active');
+    }
+
+    function appealInfraction() {
+      // Implementación para apelar una infracción
+      alert("Apelación de infracción enviada. Esperando respuesta del administrador...");
+      document.getElementById('infractionModal').classList.remove('active');
+    }
+
+    function appealBlock() {
+      // Implementación para apelar un bloqueo
+      alert("Apelación de bloqueo enviada. Esperando respuesta del administrador...");
+      document.getElementById('blockModal').classList.remove('active');
+    }
+
+
   </script>
 </body>
 </html>
