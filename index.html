@@ -360,6 +360,21 @@
       border: 1px solid #ddd;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+    @media (max-width: 768px) {
+      .user-info {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        padding: 8px 12px;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        width: calc(100% - 20px);
+      }
+      .user-info span {
+        font-size: 12px !important;
+      }
+    }
     .user-info img {
       border-radius: 50%;
       object-fit: cover;
@@ -370,8 +385,8 @@
     }
     /* Botón "Seguir" con animación */
     .user-info .follow-btn {
-      margin-left: 10px;
-      padding: 5px 10px;
+      margin-left: auto;
+      padding: 5px 15px;
       border: none;
       border-radius: 12px;
       background-color: var(--primary-color);
@@ -379,6 +394,14 @@
       font-size: 12px;
       cursor: pointer;
       transition: background-color 0.3s, transform 0.3s;
+    }
+    @media (max-width: 768px) {
+      .user-info .follow-btn {
+        padding: 6px 20px;
+        font-size: 14px;
+        margin-left: 0;
+        flex: 0 0 auto;
+      }
     }
     .user-info .follow-btn:hover {
       transform: scale(1.05);
