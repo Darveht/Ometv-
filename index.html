@@ -259,16 +259,16 @@
       grid-template-columns: 1fr 1fr;
       gap: 5px;
       width: 100%;
-      height: calc(100vh - 100px);
+      height: calc(100vh - 120px);
       padding: 5px;
       align-items: center;
     }
     .video-container {
       position: relative;
       background: #000;
-      aspect-ratio: 4/5;
+      aspect-ratio: 9/16;
       overflow: hidden;
-      max-height: 80vh;
+      max-height: 85vh;
       border-radius: 12px;
       margin: auto;
     }
@@ -276,12 +276,12 @@
       .video-grid {
         padding: 0;
         gap: 2px;
-        height: calc(100vh - 60px);
+        height: calc(100vh - 80px);
       }
       .video-container {
-        aspect-ratio: 4/5;
+        aspect-ratio: 9/16;
         height: auto;
-        max-height: 70vh;
+        max-height: 75vh;
       }
       .local-video video, .remote-video video {
         object-fit: cover;
@@ -303,13 +303,16 @@
     }
     /* Controles y swipe */
     .video-controls {
-      position: absolute;
+      position: fixed;
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
       gap: 20px;
-      z-index: 11;
+      z-index: 1100;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px 20px;
+      border-radius: 30px;
     }
     .control-btn {
       width: 50px;
