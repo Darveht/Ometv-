@@ -1951,16 +1951,38 @@ username:
     }
 
     // Sistema de puntuación de riesgo por tipo de reporte
-    const RISK_SCORES = {
-      'desnudos': 80,
-      'violencia': 90,
-      'explicito': 85,
-      'menor': 100,
-      'acoso': 70,
-      'spam': 30,
-      'suplantacion': 60,
-      'otro': 20
+    const vision = require('@google-cloud/vision');
+const client = new vision.ImageAnnotatorClient({
+  keyFilename: 'AIzaSyCy0DRh_QUDQkfb7edn95hOix0N33Lhsa4'
+});
+
+const RISK_SCORES = {
+      'desnudos': 60,
+      'violencia': 70,
+      'explicito': 65,
+      'menor': 80,
+      'acoso': 50,
+      'spam': 20,
+      'suplantacion': 40,
+      'otro': 10
     };
+
+    async function analyzeImage(imageUrl) {
+      try {
+        const [result] = await client.safeSearchDetection(imageUrl);
+        const detections = result.safeSearchAnnotation;
+        
+        let imageRiskScore = 0;
+        if(detections.adult === 'VERY_LIKELY') imageRiskScore += 80;
+        if(detections.violence === 'VERY_LIKELY') imageRiskScore += 70;
+        if(detections.racy === 'VERY_LIKELY') imageRiskScore += 60;
+        
+        return imageRiskScore;
+      } catch(err) {
+        console.error('Error analizando imagen:', err);
+        return 0;
+      }
+    }
 
     // Analiza el historial de reportes
     async function analyzeReportHistory(uid) {
@@ -1970,15 +1992,30 @@ username:
       let riskScore = 0;
       let reportCount = 0;
       let recentReports = 0;
+      let confirmedReports = 0;
       const now = Date.now();
       
-      Object.values(reports).forEach(report => {
+      for(const report of Object.values(reports)) {
         reportCount++;
         if (now - report.timestamp < 7 * 24 * 60 * 60 * 1000) { // Últimos 7 días
           recentReports++;
-          riskScore += RISK_SCORES[report.tipo] || 0;
+          const baseScore = RISK_SCORES[report.tipo] || 0;
+          
+          // Analizar evidencia de imagen si existe
+          if(report.evidenceUrl) {
+            const imageScore = await analyzeImage(report.evidenceUrl);
+            riskScore += (baseScore + imageScore) / 2;
+            if(imageScore > 50) confirmedReports++;
+          } else {
+            riskScore += baseScore * 0.5; // Menor peso sin evidencia
+          }
         }
-      });
+      }
+      
+      // Ajustar score basado en reportes confirmados
+      if(confirmedReports > 0) {
+        riskScore *= (1 + (confirmedReports / recentReports) * 0.5);
+      }
 
       return {
         totalReports: reportCount,
