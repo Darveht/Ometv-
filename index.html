@@ -2334,24 +2334,57 @@ username:
     }
 
     function showBlockModal(days) {
-      const blockCountdownEl = document.getElementById('blockCountdown');
-      let countDownDate = new Date();
-      countDownDate.setDate(countDownDate.getDate() + days);
-      const x = setInterval(function() {
-        let now = new Date().getTime();
-        let t = countDownDate - now;
-        let days = Math.floor(t / (1000 * 60 * 60 * 24));
-        let hours = Math.floor((t % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        let minutes = Math.floor((t % (1000 * 60 * 60)) / (1000 * 60));
-        let seconds = Math.floor((t % (1000 * 60)) / 1000);
-        blockCountdownEl.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
-        if (t < 0) {
-          clearInterval(x);
-          blockCountdownEl.innerHTML = "Bloqueo finalizado";
-          database.ref('profiles/' + currentUser.uid).update({ blocked: false, blockedUntil: null });
-        }
-      }, 1000);
-      document.getElementById('blockModal').classList.add('active');
+      // Solo mostrar si hay un usuario actual
+      if (!currentUser) return;
+
+      // Actualizar el perfil con el bloqueo
+      const blockEndDate = new Date();
+      blockEndDate.setDate(blockEndDate.getDate() + days);
+      
+      database.ref('profiles/' + currentUser.uid).update({
+        blocked: true,
+        blockedUntil: blockEndDate.getTime()
+      }).then(() => {
+        const blockCountdownEl = document.getElementById('blockCountdown');
+        const modal = document.getElementById('blockModal');
+        
+        // Asegurar que el modal esté visible y en pantalla completa
+        modal.style.display = 'flex';
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.9)';
+        modal.style.zIndex = '9999';
+        modal.classList.add('active');
+
+        // Iniciar countdown
+        const x = setInterval(function() {
+          let now = new Date().getTime();
+          let t = blockEndDate.getTime() - now;
+          
+          if (t < 0) {
+            clearInterval(x);
+            blockCountdownEl.innerHTML = "Bloqueo finalizado";
+            database.ref('profiles/' + currentUser.uid).update({ 
+              blocked: false, 
+              blockedUntil: null 
+            });
+            modal.classList.remove('active');
+            goToScreen('loginScreen');
+          } else {
+            let days = Math.floor(t / (1000 * 60 * 60 * 24));
+            let hours = Math.floor((t % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let minutes = Math.floor((t % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((t % (1000 * 60)) / 1000);
+            blockCountdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+          }
+        }, 1000);
+
+        // Redirigir a la pantalla de bloqueo
+        goToScreen('blockedScreen');
+      });
     }
 
     function appealInfraction() {
