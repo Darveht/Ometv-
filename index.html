@@ -1093,7 +1093,7 @@
             <i class="fa-solid fa-arrows-rotate"></i>
           </div>
         </div>
-        <div class="swipe-hint"><i class="fa-solid fa-chevron-right"></i></div>
+        
       </div>
     </div>
 
@@ -1824,17 +1824,7 @@ username:
         findRandomUser();
       }, 2000);
     }
-    let touchStartX = 0;
-    let touchEndX = 0;
-    document.querySelector('.video-container').addEventListener('touchstart', e => {
-      touchStartX = e.changedTouches[0].screenX;
-    });
-    document.querySelector('.video-container').addEventListener('touchend', e => {
-      touchEndX = e.changedTouches[0].screenX;
-      if(touchEndX < touchStartX){
-        restartCall();
-      }
-    });
+    
     document.getElementById('registerPassword').addEventListener('focus', () => {
       document.getElementById('passwordMonkey').style.display = 'block';
     });
