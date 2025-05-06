@@ -52,14 +52,22 @@
       pointer-events: none;
       display: none; /* Oculta por defecto, se muestra en videoCallScreen */
     }
-    /* Ícono de reporte */
+    /* Íconos de estado de cuenta y reporte */
+    .account-status-icon,
     .report-icon {
       position: fixed;
       width: 40px;
       cursor: pointer;
       z-index: 1100;
-      top: 10px;
       right: 10px;
+    }
+    
+    .account-status-icon {
+      top: 10px;
+    }
+    
+    .report-icon {
+      top: 60px;
     }
     .screen {
       width: 100vw;
@@ -930,6 +938,12 @@
 <body>
   <!-- La marca de agua se mostrará únicamente en el videoCallScreen -->
   <div class="watermark">BealyChat</div>
+  <!-- Ícono de Estado de Cuenta -->
+  <img class="account-status-icon" 
+       src="https://cdn-icons-png.flaticon.com/512/3237/3237472.png" 
+       alt="Estado de Cuenta" 
+       onclick="openAccountStatusScreen()"
+       style="display: block;">
   <!-- Ícono de Reporte -->
   <img class="report-icon" src="https://cdn-icons-png.flaticon.com/512/13984/13984890.png" alt="Reportar" onclick="openReportModal()"
        style="display: block;">
