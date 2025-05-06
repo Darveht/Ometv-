@@ -710,6 +710,33 @@
     .btn-report:hover {
       background: #ff2d6f;
     }
+    .bottom-controls {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1100;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px 20px;
+      border-radius: 30px;
+    }
+    .follow-btn {
+      padding: 10px 25px;
+      border: none;
+      border-radius: 20px;
+      background-color: var(--primary-color);
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .follow-btn:hover {
+      transform: scale(1.05);
+      background-color: #00a000;
+    }
     .report-status {
       margin-top: 16px;
       text-align: center;
@@ -1136,9 +1163,11 @@
             <img id="remoteVerifiedBadge" class="verified-badge" 
                  src="https://static.vecteezy.com/system/resources/thumbnails/049/232/596/small_2x/verified-badge-blue-color-for-social-media-account-png.png" 
                  alt="Verificado" style="display:none;">
-            <button class="follow-btn" onclick="followRemoteUser()">Seguir</button>
             <!-- Indicador de conexión -->
             <span id="connectionIndicator" class="connection-indicator"></span>
+          </div>
+          <div class="bottom-controls">
+            <button class="follow-btn" onclick="followRemoteUser()">Seguir</button>
           </div>
           <div class="connecting" id="connectingIndicator">
             <div style="text-align:center;">
