@@ -135,25 +135,26 @@
       margin: 0 auto;
       padding: 20px;
       text-align: center;
-      min-height: calc(100vh - 40px);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
+      box-sizing: border-box;
     }
     
     @media (max-width: 768px) {
       .screen-content {
-        padding: 10px;
+        padding: 5px 10px;
         min-height: 100vh;
-        padding-top: 10px;
-        padding-bottom: 10px;
+        padding-top: 0;
+        padding-bottom: 5px;
         justify-content: flex-start;
         overflow-y: auto;
       }
     }
     .logo {
-      margin-bottom: 20px;
-      margin-top: 10px;
+      margin-bottom: 15px;
+      margin-top: 0;
     }
     .logo h1 {
       font-size: 32px;
@@ -1331,25 +1332,36 @@
     
     @media (max-width: 480px) {
       .logo h1 {
-        font-size: 28px;
+        font-size: 26px;
+        margin-bottom: 5px;
       }
       
       .logo {
-        margin-top: 5px;
-        margin-bottom: 15px;
+        margin-top: 0;
+        margin-bottom: 10px;
+      }
+      
+      .logo p {
+        margin-top: 0;
+        margin-bottom: 5px;
       }
       
       .form-group {
-        margin-bottom: 12px;
+        margin-bottom: 10px;
       }
       
       .social-login {
-        margin-bottom: 15px;
+        margin-bottom: 10px;
       }
       
       input, select {
         font-size: 16px; /* Previene zoom en iOS */
-        padding: 12px 12px 12px 40px;
+        padding: 10px 10px 10px 35px;
+      }
+      
+      .screen-content {
+        padding: 0 10px;
+        padding-top: 0;
       }
     }
     
@@ -1358,34 +1370,54 @@
       .screen-content {
         min-height: 100vh;
         justify-content: flex-start;
-        padding-top: 5px;
+        padding-top: 0;
       }
       
       .logo {
-        margin-top: 5px;
-        margin-bottom: 10px;
+        margin-top: 0;
+        margin-bottom: 8px;
       }
       
       .form-group {
-        margin-bottom: 10px;
+        margin-bottom: 8px;
       }
     }
     
     /* Ajuste específico para pantallas muy pequeñas */
     @media (max-height: 500px) {
       .logo h1 {
-        font-size: 24px;
-        margin-bottom: 5px;
+        font-size: 22px;
+        margin-bottom: 3px;
       }
       
       .logo p {
-        font-size: 13px;
-        margin-bottom: 5px;
+        font-size: 12px;
+        margin-bottom: 3px;
       }
       
       .logo {
         margin-top: 0;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
+      }
+      
+      .screen-content {
+        padding-top: 0;
+      }
+    }
+    
+    /* Asegurar que siempre comience desde arriba */
+    @media (max-width: 768px) {
+      .container {
+        padding-top: 0;
+      }
+      
+      .screen {
+        padding-top: 0;
+      }
+      
+      body {
+        padding-top: 0;
+        margin-top: 0;
       }
     }
 
