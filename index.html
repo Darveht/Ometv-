@@ -63,15 +63,20 @@
     }
     /* Marca de agua: Solo se mostrará en el videoCallScreen */
     .watermark {
-      position: fixed;
+      position: absolute;
       top: 10px;
       left: 10px;
       font-size: 18px;
       font-weight: bold;
-      color: rgba(0, 0, 0, 0.6);
+      color: rgba(255, 255, 255, 0.8);
       z-index: 2000;
       pointer-events: none;
       display: none; /* Oculta por defecto, se muestra en videoCallScreen */
+    }
+    
+    /* Solo mostrar watermark en video call screen */
+    #videoCallScreen .watermark {
+      display: block;
     }
     /* Íconos de estado de cuenta y reporte estilo Twitter */
     .account-status-icon,
@@ -2102,11 +2107,7 @@ username:
       
       targetScreen.classList.add('active');
       
-      if(screenId === 'videoCallScreen'){
-        document.querySelector('.watermark').style.display = 'block';
-      } else {
-        document.querySelector('.watermark').style.display = 'none';
-      }
+      // La marca de agua se maneja automáticamente con CSS
       // Auto-detectar país si es la screen "countryScreen"
       if(screenId === 'countryScreen'){
         autoDetectCountry();
@@ -2273,18 +2274,7 @@ username:
       console.log("Actualizando perfil:", currentProfile);
       return database.ref('profiles/' + currentUser.uid).update(currentProfile);
     }
-    function updateBirthDateAndContinue() {
-      const birthDate = document.getElementById('birthDateInput').value;
-      if(!birthDate){
-        alert("Por favor, selecciona tu fecha de nacimiento");
-        return;
-      }
-      currentProfile = currentProfile || {};
-      currentProfile.birthDate = birthDate;
-      updateProfile().then(() => {
-        goToScreen('countryScreen');
-      });
-    }
+    // Esta función ya no es necesaria, se maneja en validateBirthDate
     async function updateProfileAndConnect(){
       try {
         const username = document.getElementById('username').value;
@@ -2336,7 +2326,15 @@ username:
       if(age < 18){
         goToScreen('blockedScreen');
       } else {
-        updateBirthDateAndContinue();
+        // Store birthdate in profile and continue
+        if(!currentProfile) currentProfile = {};
+        currentProfile.birthDate = birthDateValue;
+        updateProfile().then(() => {
+          goToScreen('countryScreen');
+        }).catch(error => {
+          console.error("Error updating profile:", error);
+          alert("Error al guardar la fecha. Intenta de nuevo.");
+        });
       }
     }
 
