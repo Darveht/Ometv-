@@ -2223,34 +2223,83 @@ username:
     });
     async function updateProfile() {
       if(!currentUser){
-        alert("No hay usuario autenticado");
-        return;
+        throw new Error("No hay usuario autenticado");
       }
-      const username = document.getElementById('username') ? document.getElementById('username').value : (currentProfile?.username || "");
-      const country = document.getElementById('country') ? document.getElementById('country').value : (currentProfile?.country || "");
-      const birthDate = currentProfile?.birthDate || "";
-      const avatarEl = document.getElementById('avatarPreview');
-      const avatar_url = (avatarEl && avatarEl.src) ? avatarEl.src : (currentProfile?.avatar_url || "");
-
-      const followersCount = currentProfile?.followersCount || 0;
-      const verified = currentProfile?.verified || false;
-
-      currentProfile = { username, country, birthDate, avatar_url, followersCount, verified };
-      console.log("Actualizando perfil:", currentProfile);
-      return database.ref('profiles/' + currentUser.uid).update(currentProfile);
+      
+      // Asegurar que currentProfile existe
+      if(!currentProfile) currentProfile = {};
+      
+      // Solo actualizar campos que existen y tienen valores válidos
+      const updates = {};
+      
+      if(currentProfile.username && currentProfile.username.trim() !== "") {
+        updates.username = currentProfile.username.trim();
+      }
+      
+      if(currentProfile.birthDate) {
+        updates.birthDate = currentProfile.birthDate;
+      }
+      
+      if(currentProfile.country) {
+        updates.country = currentProfile.country;
+      }
+      
+      if(currentProfile.avatar_url) {
+        updates.avatar_url = currentProfile.avatar_url;
+      }
+      
+      // Mantener campos existentes
+      updates.followersCount = currentProfile.followersCount || 0;
+      updates.verified = currentProfile.verified || false;
+      updates.lastUpdated = firebase.database.ServerValue.TIMESTAMP;
+      
+      console.log("Actualizando perfil con:", updates);
+      
+      try {
+        await database.ref('profiles/' + currentUser.uid).update(updates);
+        // Actualizar el perfil local
+        currentProfile = { ...currentProfile, ...updates };
+        return true;
+      } catch(error) {
+        console.error("Error actualizando perfil:", error);
+        throw error;
+      }
     }
     // Esta función ya no es necesaria, se maneja en validateBirthDate
     async function updateProfileAndConnect(){
       try {
-        const username = document.getElementById('username').value;
-        if(!username){
-          alert("Ingresa un nombre de usuario");
+        const countrySelect = document.getElementById('country');
+        const selectedCountry = countrySelect ? countrySelect.value : "";
+        
+        if(!selectedCountry){
+          alert("Por favor selecciona tu país");
           return;
         }
-        await updateProfile();
+        
+        if(!currentProfile) {
+          alert("Error: Perfil no encontrado");
+          return;
+        }
+        
+        // Actualizar solo el país
+        const updateData = {
+          country: selectedCountry,
+          lastUpdated: firebase.database.ServerValue.TIMESTAMP
+        };
+        
+        console.log("Actualizando país:", updateData);
+        
+        await database.ref('profiles/' + currentUser.uid).update(updateData);
+        
+        // Actualizar perfil local
+        currentProfile.country = selectedCountry;
+        
+        console.log("País actualizado, conectando...");
         goToScreen('videoCallScreen');
+        
       } catch(error){
-        alert("Error al actualizar el perfil: " + error);
+        console.error("Error al actualizar país:", error);
+        alert("Error al actualizar el perfil: " + error.message);
       }
     }
     function updateProfileData() {
@@ -2275,30 +2324,52 @@ username:
 
     /* ====================== GUARDAR PERFIL Y CONTINUAR ====================== */
     async function saveProfileAndContinue() {
-      const username = document.getElementById('username').value;
-      if(!username){
-        alert("Ingresa un nombre de usuario");
+      const usernameInput = document.getElementById('username');
+      const username = usernameInput ? usernameInput.value.trim() : "";
+      
+      if(!username || username.length < 2){
+        alert("Ingresa un nombre de usuario válido (mínimo 2 caracteres)");
+        return;
+      }
+      
+      if(!currentUser) {
+        alert("Error: Usuario no autenticado");
         return;
       }
       
       try {
-        // Crear perfil básico sin fecha de nacimiento
-        if(!currentProfile) currentProfile = {};
-        currentProfile.username = username;
-        currentProfile.birthDate = "2000-01-01"; // Fecha por defecto para usuarios adultos
+        // Crear o actualizar perfil
+        const profileData = {
+          username: username,
+          birthDate: "2000-01-01", // Fecha por defecto para adultos
+          followersCount: 0,
+          verified: false,
+          createdAt: firebase.database.ServerValue.TIMESTAMP,
+          lastUpdated: firebase.database.ServerValue.TIMESTAMP
+        };
         
+        // Manejar avatar
         const avatarEl = document.getElementById('avatarPreview');
         if(avatarEl && avatarEl.src && avatarEl.src.startsWith('data:')) {
-          currentProfile.avatar_url = avatarEl.src;
+          profileData.avatar_url = avatarEl.src;
         } else {
-          currentProfile.avatar_url = "https://cdn-icons-png.flaticon.com/512/3237/3237472.png";
+          profileData.avatar_url = "https://cdn-icons-png.flaticon.com/512/3237/3237472.png";
         }
         
-        await updateProfile();
+        console.log("Guardando perfil:", profileData);
+        
+        // Guardar directamente en Firebase
+        await database.ref('profiles/' + currentUser.uid).set(profileData);
+        
+        // Actualizar perfil local
+        currentProfile = profileData;
+        
+        console.log("Perfil guardado exitosamente");
         goToScreen('countryScreen');
+        
       } catch(error) {
-        console.error("Error updating profile:", error);
-        alert("Error al guardar el perfil. Intenta de nuevo.");
+        console.error("Error saving profile:", error);
+        alert("Error al guardar el perfil: " + error.message);
       }
     }
 
