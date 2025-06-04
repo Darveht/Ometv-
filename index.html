@@ -138,20 +138,22 @@
       min-height: calc(100vh - 40px);
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
     }
     
     @media (max-width: 768px) {
       .screen-content {
         padding: 10px;
         min-height: 100vh;
-        padding-top: max(20px, env(safe-area-inset-top));
-        padding-bottom: max(20px, env(safe-area-inset-bottom));
+        padding-top: 10px;
+        padding-bottom: 10px;
+        justify-content: flex-start;
+        overflow-y: auto;
       }
     }
     .logo {
-      margin-bottom: 30px;
-      margin-top: 40px;
+      margin-bottom: 20px;
+      margin-top: 10px;
     }
     .logo h1 {
       font-size: 32px;
@@ -167,7 +169,7 @@
       font-weight: 400;
     }
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       text-align: left;
     }
     .form-group label {
@@ -1322,8 +1324,8 @@
     /* ====================== OPTIMIZACIONES MÓVILES ====================== */
     @supports(padding: max(0px)) {
       .screen-content {
-        padding-left: max(20px, env(safe-area-inset-left));
-        padding-right: max(20px, env(safe-area-inset-right));
+        padding-left: max(10px, env(safe-area-inset-left));
+        padding-right: max(10px, env(safe-area-inset-right));
       }
     }
     
@@ -1333,12 +1335,21 @@
       }
       
       .logo {
-        margin-top: 20px;
-        margin-bottom: 20px;
+        margin-top: 5px;
+        margin-bottom: 15px;
+      }
+      
+      .form-group {
+        margin-bottom: 12px;
+      }
+      
+      .social-login {
+        margin-bottom: 15px;
       }
       
       input, select {
         font-size: 16px; /* Previene zoom en iOS */
+        padding: 12px 12px 12px 40px;
       }
     }
     
@@ -1347,12 +1358,34 @@
       .screen-content {
         min-height: 100vh;
         justify-content: flex-start;
-        padding-top: 20px;
+        padding-top: 5px;
       }
       
       .logo {
-        margin-top: 10px;
-        margin-bottom: 15px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+      }
+      
+      .form-group {
+        margin-bottom: 10px;
+      }
+    }
+    
+    /* Ajuste específico para pantallas muy pequeñas */
+    @media (max-height: 500px) {
+      .logo h1 {
+        font-size: 24px;
+        margin-bottom: 5px;
+      }
+      
+      .logo p {
+        font-size: 13px;
+        margin-bottom: 5px;
+      }
+      
+      .logo {
+        margin-top: 0;
+        margin-bottom: 10px;
       }
     }
 
@@ -3275,5 +3308,3 @@ username:
   </script>
 </body>
 </html>
-
- 
