@@ -145,52 +145,49 @@
       width: 100%;
       max-width: 400px;
       margin: 0 auto;
-      padding: 0 20px;
+      padding: 40px 20px;
       text-align: center;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
+      justify-content: center;
       box-sizing: border-box;
-      padding-top: 0;
-      margin-top: 0;
     }
     
     @media (max-width: 768px) {
       .screen-content {
-        padding: 0 10px;
+        padding: 20px 15px;
         min-height: 100vh;
-        padding-top: 0;
-        padding-bottom: 0;
-        justify-content: flex-start;
+        justify-content: center;
         overflow-y: auto;
-        margin-top: 0;
+      }
+      
+      .logo {
+        margin-bottom: 25px;
+      }
+      
+      .form-group {
+        margin-bottom: 18px;
       }
     }
     .logo {
-      margin-bottom: 10px;
-      margin-top: 0;
-      padding-top: 0;
+      margin-bottom: 30px;
     }
     .logo h1 {
       font-size: 32px;
       color: var(--light-text);
       font-weight: 900;
       letter-spacing: -0.5px;
-      margin-bottom: 5px;
-      margin-top: 0;
-      padding-top: 0;
+      margin-bottom: 8px;
     }
     .logo p {
       font-size: 15px;
-      margin-top: 0;
       margin-bottom: 0;
-      padding-top: 0;
       color: var(--gray-text);
       font-weight: 400;
     }
     .form-group {
-      margin-bottom: 15px;
+      margin-bottom: 20px;
       text-align: left;
     }
     .form-group label {
@@ -229,7 +226,7 @@
     }
     .btn {
       width: 100%;
-      padding: 12px 24px;
+      padding: 15px 24px;
       border: none;
       border-radius: 9999px;
       font-size: 15px;
@@ -237,8 +234,8 @@
       cursor: pointer;
       transition: all 0.2s ease;
       text-align: center;
-      margin-top: 10px;
-      min-height: 44px;
+      margin-top: 20px;
+      min-height: 50px;
     }
     .btn-primary {
       background-color: var(--primary-color);
@@ -540,28 +537,7 @@
       pointer-events: auto;
     }
 
-    /* ====================== PANTALLA DE FECHA DE NACIMIENTO ====================== */
-    .birthdate-container {
-      padding: 40px 20px;
-    }
-    .birthdate-container h2 {
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    .birthdate-container input[type="date"] {
-      width: 100%;
-      padding: 15px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      background-color: var(--card-bg);
-      color: var(--light-text);
-      font-size: 16px;
-      outline: none;
-      transition: border-color 0.3s;
-    }
-    .birthdate-container input[type="date"]:focus {
-      border-color: var(--primary-color);
-    }
+    
 
     /* ====================== PANTALLA DE CUENTA BLOQUEADA ====================== */
     .blocked-screen {
@@ -1687,18 +1663,12 @@
               <input type="text" id="username" placeholder="Elige un nombre de usuario" required>
             </div>
           </div>
-          <button type="button" class="btn btn-primary mt-4" onclick="goToScreen('birthDateScreen')">Continuar</button>
+          <button type="button" class="btn btn-primary mt-4" onclick="saveProfileAndContinue()">Continuar</button>
         </div>
       </div>
     </div>
 
-    <div class="screen" id="birthDateScreen">
-      <div class="screen-content birthdate-container">
-        <h2>Selecciona tu fecha de nacimiento</h2>
-        <input type="date" id="birthDateInput" required>
-        <button type="button" class="btn btn-primary mt-4" onclick="validateBirthDate()">Continuar</button>
-      </div>
-    </div>
+    
 
     <div class="screen" id="countryScreen">
       <div class="screen-content">
@@ -2217,18 +2187,13 @@ username:
                 return;
               }
             }
-            // Si ya tiene username, avatar, country y birthDate, está completo
-            if(currentProfile.username && currentProfile.avatar_url && currentProfile.country && currentProfile.birthDate){
+            // Si ya tiene username, avatar y country, está completo
+            if(currentProfile.username && currentProfile.avatar_url && currentProfile.country){
               // Vamos a videollamada (sobreescribe la pantalla anterior)
               goToScreen('videoCallScreen');
             } else {
-              // Si le falta algo, revisamos si no tiene birthDate => birthDateScreen
-              if(!currentProfile.birthDate){
-                goToScreen('birthDateScreen');
-              } else {
-                // Sino, al profileSetupScreen
-                goToScreen('profileSetupScreen');
-              }
+              // Sino, al profileSetupScreen
+              goToScreen('profileSetupScreen');
             }
           } else {
             // No existe su perfil en la DB, lo mandamos a la configuración
@@ -2308,33 +2273,32 @@ username:
         .catch(err => alert("Error al actualizar perfil: " + err));
     }
 
-    /* ====================== VALIDACIÓN DE FECHA DE NACIMIENTO ====================== */
-    function validateBirthDate() {
-      const birthDateValue = document.getElementById('birthDateInput').value;
-      if(!birthDateValue){
-        alert("Selecciona tu fecha de nacimiento");
+    /* ====================== GUARDAR PERFIL Y CONTINUAR ====================== */
+    async function saveProfileAndContinue() {
+      const username = document.getElementById('username').value;
+      if(!username){
+        alert("Ingresa un nombre de usuario");
         return;
       }
-      const birthDate = new Date(birthDateValue);
-      const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const m = today.getMonth() - birthDate.getMonth();
-      if(m < 0 || (m === 0 && today.getDate() < birthDate.getDate())){
-        age--;
-      }
-      console.log("Edad calculada:", age);
-      if(age < 18){
-        goToScreen('blockedScreen');
-      } else {
-        // Store birthdate in profile and continue
+      
+      try {
+        // Crear perfil básico sin fecha de nacimiento
         if(!currentProfile) currentProfile = {};
-        currentProfile.birthDate = birthDateValue;
-        updateProfile().then(() => {
-          goToScreen('countryScreen');
-        }).catch(error => {
-          console.error("Error updating profile:", error);
-          alert("Error al guardar la fecha. Intenta de nuevo.");
-        });
+        currentProfile.username = username;
+        currentProfile.birthDate = "2000-01-01"; // Fecha por defecto para usuarios adultos
+        
+        const avatarEl = document.getElementById('avatarPreview');
+        if(avatarEl && avatarEl.src && avatarEl.src.startsWith('data:')) {
+          currentProfile.avatar_url = avatarEl.src;
+        } else {
+          currentProfile.avatar_url = "https://cdn-icons-png.flaticon.com/512/3237/3237472.png";
+        }
+        
+        await updateProfile();
+        goToScreen('countryScreen');
+      } catch(error) {
+        console.error("Error updating profile:", error);
+        alert("Error al guardar el perfil. Intenta de nuevo.");
       }
     }
 
