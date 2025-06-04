@@ -14,8 +14,8 @@
   <style>
     /* ====================== ESTILOS TIPO TWITTER ====================== */
     :root {
-      --primary-color: #1DA1F2; /* Twitter Blue */
-      --secondary-color: #794BC4; /* Twitter Purple */
+      --primary-color: #1D9BF0; /* Twitter Blue */
+      --secondary-color: #1D9BF0; 
       --background: #000000; /* Twitter Dark Background */
       --card-bg: #16181C; /* Twitter Card Background */
       --light-text: #E7E9EA; /* Twitter Light Text */
@@ -24,6 +24,7 @@
       --hover-bg: #1C1F23; /* Twitter Hover Background */
       --danger-color: #F4212E; /* Twitter Red */
       --success-color: #00BA7C; /* Twitter Green */
+      --twitter-blue-hover: #1A8CD8;
     }
     html, body {
       margin: 0;
@@ -31,6 +32,15 @@
       background-color: var(--background);
       color: var(--light-text);
       overflow-x: hidden;
+      overflow-y: hidden;
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      position: fixed;
+      width: 100%;
+      height: 100%;
     }
     * {
       box-sizing: border-box;
@@ -41,6 +51,8 @@
       height: 100vh;
       position: relative;
       overflow: hidden;
+      touch-action: none;
+      user-select: none;
     }
     /* Marca de agua: Solo se mostrará en el videoCallScreen */
     .watermark {
@@ -102,12 +114,18 @@
       background-color: var(--background);
       transition: transform 0.3s ease;
       overflow: hidden;
+      touch-action: none;
+      pointer-events: none;
     }
     .screen.active {
       transform: translateX(0);
+      pointer-events: auto;
+      z-index: 10;
     }
     .screen:not(.active) {
       transform: translateX(100%);
+      pointer-events: none;
+      z-index: 1;
     }
     .screen-content {
       width: 100%;
@@ -813,6 +831,105 @@
       min-height: 20px;
       color: var(--gray-text);
     }
+    
+    /* Animaciones para mensajes de reporte */
+    .report-success-message,
+    .report-error-message {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 16px;
+    }
+    
+    .report-success-message {
+      background: rgba(0, 186, 124, 0.1);
+      border: 1px solid rgba(0, 186, 124, 0.3);
+    }
+    
+    .report-success-message i {
+      font-size: 32px;
+      color: var(--success-color);
+      animation: successPulse 0.6s ease;
+    }
+    
+    .report-success-message p:first-of-type {
+      font-weight: 700;
+      color: var(--success-color);
+      margin: 0;
+      font-size: 16px;
+    }
+    
+    .report-success-message p:last-of-type {
+      color: var(--gray-text);
+      margin: 0;
+      font-size: 14px;
+    }
+    
+    .report-error-message {
+      background: rgba(244, 33, 46, 0.1);
+      border: 1px solid rgba(244, 33, 46, 0.3);
+    }
+    
+    .report-error-message i {
+      font-size: 32px;
+      color: var(--danger-color);
+      animation: errorShake 0.5s ease;
+    }
+    
+    @keyframes successPulse {
+      0% { transform: scale(0.8); opacity: 0; }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    @keyframes errorShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    
+    /* Animaciones para opciones de reporte */
+    .report-option {
+      transition: all 0.3s ease;
+    }
+    
+    .report-option:hover {
+      transform: translateX(4px);
+    }
+    
+    /* Animación del botón de reporte */
+    .btn-report {
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-report:not(:disabled):hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(244, 33, 46, 0.3);
+    }
+    
+    .btn-report .fa-spinner {
+      animation: spin 1s linear infinite;
+    }
+    
+    .btn-report .fa-check {
+      animation: checkmark 0.6s ease;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes checkmark {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
 
     /* ====================== ESTILOS PARA LA NUEVA PANTALLA DE AJUSTES ====================== */
     .settings-container {
@@ -944,6 +1061,247 @@
     }
     .appeal-btn:hover {
       opacity: 0.9;
+    }
+
+    /* ====================== MODAL DE BLOQUEO POR OFENSAS - PANTALLA COMPLETA ESTILO TWITTER ====================== */
+    .offense-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: var(--background);
+      z-index: 1500;
+      animation: slideUpFullscreen 0.4s ease;
+      overflow-y: auto;
+    }
+    .offense-modal.active {
+      display: block;
+    }
+    @keyframes slideUpFullscreen {
+      from { 
+        transform: translateY(100%);
+        opacity: 0;
+      }
+      to { 
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    .offense-content {
+      background: var(--background);
+      width: 100%;
+      height: 100%;
+      padding: 40px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .offense-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--background);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 20px;
+      z-index: 1600;
+      display: flex;
+      align-items: center;
+      backdrop-filter: blur(12px);
+    }
+    .offense-header h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--light-text);
+      text-align: center;
+      flex: 1;
+    }
+    .offense-close-btn {
+      position: absolute;
+      left: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--hover-bg);
+      border: none;
+      color: var(--light-text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .offense-close-btn:hover {
+      background: var(--border-color);
+    }
+    .offense-main-content {
+      margin-top: 80px;
+      max-width: 500px;
+      width: 100%;
+    }
+    .offense-icon {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 32px;
+      background: var(--danger-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulseOffense 2s infinite;
+      box-shadow: 0 20px 40px rgba(244, 33, 46, 0.3);
+    }
+    @keyframes pulseOffense {
+      0%, 100% { transform: scale(1); box-shadow: 0 20px 40px rgba(244, 33, 46, 0.3); }
+      50% { transform: scale(1.05); box-shadow: 0 25px 50px rgba(244, 33, 46, 0.4); }
+    }
+    .offense-icon i {
+      font-size: 48px;
+      color: white;
+    }
+    .offense-title {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--light-text);
+      margin-bottom: 8px;
+      letter-spacing: -1px;
+    }
+    .offense-subtitle {
+      font-size: 20px;
+      color: var(--danger-color);
+      margin-bottom: 24px;
+      font-weight: 700;
+    }
+    .offense-description {
+      font-size: 16px;
+      color: var(--gray-text);
+      line-height: 1.6;
+      margin-bottom: 32px;
+      padding: 0 16px;
+    }
+    .offense-timer {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 24px 0;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    }
+    .offense-timer h3 {
+      margin: 0 0 16px 0;
+      color: var(--light-text);
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .offense-countdown {
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--danger-color);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+      letter-spacing: 1px;
+    }
+    .offense-detected-word {
+      background: rgba(244, 33, 46, 0.1);
+      border: 1px solid rgba(244, 33, 46, 0.3);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 24px 0;
+      color: var(--danger-color);
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .offense-warning-indicator {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--background);
+      z-index: 1400;
+      animation: warningSlideUp 0.3s ease;
+    }
+    .offense-warning-indicator.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    @keyframes warningSlideUp {
+      from { 
+        transform: translateY(100%);
+        opacity: 0;
+      }
+      to { 
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    .warning-content {
+      text-align: center;
+      padding: 40px 20px;
+      max-width: 400px;
+    }
+    .warning-icon {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 24px;
+      background: linear-gradient(135deg, #FF6B6B, #FF5722);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: warningPulse 1s ease infinite;
+    }
+    @keyframes warningPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    .warning-icon i {
+      font-size: 40px;
+      color: white;
+    }
+    .warning-title {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--light-text);
+      margin-bottom: 16px;
+    }
+    .warning-message {
+      font-size: 16px;
+      color: var(--gray-text);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .warning-word {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-family: monospace;
+      color: var(--danger-color);
+      font-weight: 600;
+    }
+    .warning-dismiss-btn {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 9999px;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .warning-dismiss-btn:hover {
+      background: #1A8CD8;
+      transform: translateY(-1px);
     }
 
     /* ====================== NUEVA PANTALLA DE SOPORTE (INCIDENCIAS) ====================== */
@@ -1434,6 +1792,67 @@
     </div>
   </div>
 
+  <!-- MODAL DE BLOQUEO POR OFENSAS - PANTALLA COMPLETA -->
+  <div class="offense-modal" id="offenseModal">
+    <div class="offense-content">
+      <div class="offense-header">
+        <button class="offense-close-btn" onclick="closeOffenseModal()">
+          <i class="fa-solid fa-times"></i>
+        </button>
+        <h1>Cuenta Suspendida</h1>
+      </div>
+      
+      <div class="offense-main-content">
+        <div class="offense-icon">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h2 class="offense-title">Cuenta Bloqueada</h2>
+        <h3 class="offense-subtitle">Moderación Automática Activada</h3>
+        <p class="offense-description">
+          Nuestros sistemas de moderación automática han detectado contenido inapropiado o lenguaje ofensivo en tu transmisión. 
+          Tu cuenta ha sido bloqueada temporalmente para mantener un ambiente seguro para todos los usuarios.
+        </p>
+        <div class="offense-detected-word" id="detectedWord">
+          Palabra detectada: <span id="offensiveWordDisplay"></span>
+        </div>
+        <div class="offense-timer">
+          <h3>Tiempo restante de bloqueo</h3>
+          <div class="offense-countdown" id="offenseCountdown">
+            3 días 00:00:00
+          </div>
+        </div>
+        <p class="offense-description">
+          Puedes apelar esta decisión contactando a nuestro equipo de soporte. 
+          Recuerda seguir nuestras pautas de la comunidad para evitar futuras restricciones.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- INDICADOR DE ADVERTENCIA - PANTALLA COMPLETA -->
+  <div class="offense-warning-indicator" id="warningIndicator">
+    <div class="warning-content">
+      <div class="warning-icon">
+        <i class="fa-solid fa-exclamation-triangle"></i>
+      </div>
+      <h2 class="warning-title">Lenguaje Inapropiado Detectado</h2>
+      <p class="warning-message">
+        Nuestro sistema ha detectado lenguaje ofensivo en tu transmisión. 
+        Este es tu <span id="warningCount">1</span> de 3 advertencias.
+      </p>
+      <div class="warning-word" id="warningWordDisplay">
+        Palabra detectada: "ejemplo"
+      </div>
+      <p class="warning-message">
+        Por favor, mantén un lenguaje apropiado. Si recibes 3 advertencias, 
+        tu cuenta será bloqueada temporalmente.
+      </p>
+      <button class="warning-dismiss-btn" onclick="dismissWarning()">
+        Entendido
+      </button>
+    </div>
+  </div>
+
   <!-- NUEVA PANTALLA: SOPORTE / INCIDENCIAS -->
   <div class="screen" id="supportScreen">
       <div class="support-container">
@@ -1471,14 +1890,14 @@
   <script>
     /* ====================== INICIALIZAR FIREBASE ====================== */
     const firebaseConfig = {
-      apiKey: "AIzaSyAAIE-9Jv6YftosuYNbdaIbAtS9ByZRxbk",
-      authDomain: "clack-828c7.firebaseapp.com",
-      databaseURL: "https://clack-828c7-default-rtdb.firebaseio.com",
-      projectId: "clack-828c7",
-      storageBucket: "clack-828c7.firebasestorage.app",
-      messagingSenderId: "254651689995",
-      appId: "1:254651689995:web:0dc857d98bb5b34c81eb0e",
-      measurementId: "G-2B8DL55NF8"
+      apiKey: "AIzaSyCFQ_geG0HIv2EZ-bfKc97TJNtf2sdqPzc",
+      authDomain: "clack-koder.firebaseapp.com",
+      databaseURL: "https://clack-koder-default-rtdb.firebaseio.com",
+      projectId: "clack-koder",
+      storageBucket: "clack-koder.firebasestorage.app",
+      messagingSenderId: "478151254938",
+      appId: "1:478151254938:web:e2c00e3a5426bd192b9023",
+      measurementId: "G-P29ME5Z3S1"
     };
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
@@ -1499,6 +1918,21 @@
     let currentCallId = null;
     let userPhotos = [null, null, null, null, null, null];
     let remoteUidGlobal = null; // Para el UID remoto
+    let speechRecognition = null;
+    let isListening = false;
+    let offenseCount = 0;
+    
+    // Lista de palabras ofensivas - se puede expandir
+    const OFFENSIVE_WORDS = [
+      'feo', 'horrible', 'pato', 'pinga', 'idiota', 'estúpido', 'tonto', 
+      'imbécil', 'pendejo', 'cabrón', 'puto', 'perra', 'zorra', 
+      'maldito', 'jodido', 'coño', 'carajo', 'mierda', 'cagada',
+      'ugly', 'stupid', 'idiot', 'bitch', 'fuck', 'shit', 'damn',
+      'asshole', 'motherfucker', 'bastard', 'whore', 'slut'
+    ];
+    
+    const OFFENSE_THRESHOLD = 3; // Número de ofensas antes del bloqueo
+    const BLOCK_DURATION_DAYS = 3;
 
     const configuration = {
       iceServers: [
@@ -1515,8 +1949,15 @@ username:
 
     /* ====================== MANEJO DE PANTALLAS ====================== */
     function goToScreen(screenId) {
+      // Prevenir cambios de pantalla no autorizados
+      if (!screenId || typeof screenId !== 'string') return;
+      
       document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
-      document.getElementById(screenId).classList.add('active');
+      const targetScreen = document.getElementById(screenId);
+      if (!targetScreen) return;
+      
+      targetScreen.classList.add('active');
+      
       if(screenId === 'videoCallScreen'){
         document.querySelector('.watermark').style.display = 'block';
       } else {
@@ -1531,6 +1972,13 @@ username:
         startLocalStream();
         showConnecting();
         startMatching();
+        // Iniciar monitoreo de voz para detectar ofensas
+        setTimeout(() => {
+          startSpeechMonitoring();
+        }, 2000);
+      } else {
+        // Detener monitoreo si salimos de la videollamada
+        stopSpeechMonitoring();
       }
     }
     function toggleForm(formType) {
@@ -1614,7 +2062,13 @@ username:
               const now = new Date();
               const blockedUntil = new Date(currentProfile.blockedUntil);
               if(now < blockedUntil){
-                goToScreen('blockedScreen');
+                // Si es bloqueo por ofensas, mostrar modal especial
+                if(currentProfile.blockReason && currentProfile.blockReason.includes('Lenguaje ofensivo')){
+                  const detectedWord = currentProfile.blockReason.match(/detectado: "(.+?)"/)?.[1] || 'palabra ofensiva';
+                  showBlockModal(detectedWord, blockedUntil);
+                } else {
+                  goToScreen('blockedScreen');
+                }
                 return;
               }
             }
@@ -1808,6 +2262,229 @@ username:
       }
     });
 
+    /* ====================== SISTEMA DE DETECCIÓN DE OFENSAS ====================== */
+    function initSpeechRecognition() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        console.warn('Speech Recognition no está disponible en este navegador');
+        return;
+      }
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      speechRecognition = new SpeechRecognition();
+      
+      speechRecognition.continuous = true;
+      speechRecognition.interimResults = true;
+      speechRecognition.lang = 'es-ES';
+      
+      speechRecognition.onstart = () => {
+        console.log('🎤 Monitoreo de audio iniciado');
+        isListening = true;
+      };
+      
+      speechRecognition.onresult = (event) => {
+        let finalTranscript = '';
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal && event.results[i][0].confidence > 0.7) {
+            finalTranscript += event.results[i][0].transcript + ' ';
+          }
+        }
+        
+        if (finalTranscript.trim() !== '' && finalTranscript.length > 2) {
+          console.log('🗣️ Texto detectado:', finalTranscript);
+          // Debounce para evitar múltiples detecciones
+          clearTimeout(window.speechTimeout);
+          window.speechTimeout = setTimeout(() => {
+            checkForOffensiveLanguage(finalTranscript);
+          }, 500);
+        }
+      };
+      
+      speechRecognition.onerror = (event) => {
+        console.error('Error en reconocimiento de voz:', event.error);
+        if (event.error !== 'no-speech') {
+          setTimeout(() => {
+            if (isListening) startSpeechMonitoring();
+          }, 1000);
+        }
+      };
+      
+      speechRecognition.onend = () => {
+        console.log('🎤 Reconocimiento de voz terminado');
+        if (isListening) {
+          setTimeout(() => startSpeechMonitoring(), 500);
+        }
+      };
+    }
+
+    function startSpeechMonitoring() {
+      if (!speechRecognition) {
+        initSpeechRecognition();
+      }
+      
+      if (speechRecognition && !isListening) {
+        try {
+          speechRecognition.start();
+        } catch (error) {
+          console.error('Error iniciando reconocimiento:', error);
+        }
+      }
+    }
+
+    function stopSpeechMonitoring() {
+      isListening = false;
+      if (speechRecognition) {
+        speechRecognition.stop();
+      }
+    }
+
+    function checkForOffensiveLanguage(text) {
+      const normalizedText = text.toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^\w\s]/g, ''); // Remover puntuación
+      
+      const words = normalizedText.split(/\s+/);
+      
+      for (const word of OFFENSIVE_WORDS) {
+        const normalizedWord = word.toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '');
+        
+        // Buscar coincidencias exactas en palabras completas
+        for (const textWord of words) {
+          if (textWord === normalizedWord || 
+              textWord.includes(normalizedWord) && normalizedWord.length > 3) {
+            console.log('🚨 Palabra ofensiva detectada:', word);
+            handleOffensiveLanguage(word);
+            return;
+          }
+        }
+      }
+    }
+
+    async function handleOffensiveLanguage(detectedWord) {
+      offenseCount++;
+      
+      if (offenseCount < OFFENSE_THRESHOLD) {
+        showWarning(detectedWord);
+        
+        // Registrar la advertencia en Firebase
+        if (currentUser) {
+          database.ref(`warnings/${currentUser.uid}`).push({
+            word: detectedWord,
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            count: offenseCount
+          });
+        }
+      } else {
+        // Bloquear usuario
+        await blockUserForOffense(detectedWord);
+      }
+    }
+
+    function showWarning(word) {
+      const indicator = document.getElementById('warningIndicator');
+      const wordDisplay = document.getElementById('warningWordDisplay');
+      const countDisplay = document.getElementById('warningCount');
+      
+      wordDisplay.textContent = `Palabra detectada: "${word}"`;
+      countDisplay.textContent = offenseCount;
+      
+      indicator.classList.add('active');
+    }
+
+    function dismissWarning() {
+      const indicator = document.getElementById('warningIndicator');
+      indicator.classList.remove('active');
+    }
+
+    function closeOffenseModal() {
+      const modal = document.getElementById('offenseModal');
+      modal.classList.remove('active');
+    }
+
+    async function blockUserForOffense(detectedWord) {
+      if (!currentUser) return;
+      
+      const blockUntil = new Date();
+      blockUntil.setDate(blockUntil.getDate() + BLOCK_DURATION_DAYS);
+      
+      const blockData = {
+        blocked: true,
+        blockedUntil: blockUntil.toISOString(),
+        blockReason: `Lenguaje ofensivo detectado: "${detectedWord}"`,
+        offenseCount: offenseCount,
+        lastOffense: firebase.database.ServerValue.TIMESTAMP
+      };
+      
+      try {
+        // Actualizar perfil del usuario
+        await database.ref(`profiles/${currentUser.uid}`).update(blockData);
+        
+        // Registrar el bloqueo
+        await database.ref(`blocks/${currentUser.uid}`).push({
+          reason: blockData.blockReason,
+          detectedWord: detectedWord,
+          duration: BLOCK_DURATION_DAYS,
+          timestamp: firebase.database.ServerValue.TIMESTAMP,
+          automatic: true
+        });
+        
+        // Mostrar modal de bloqueo
+        showBlockModal(detectedWord, blockUntil);
+        
+        // Detener reconocimiento de voz
+        stopSpeechMonitoring();
+        
+        // Cerrar la llamada actual
+        if (peerConnection) {
+          peerConnection.close();
+        }
+        
+        // Remover del listado de usuarios online
+        database.ref(`onlineUsers/${currentUser.uid}`).remove();
+        
+        console.log(`🚫 Usuario bloqueado por ${BLOCK_DURATION_DAYS} días por: "${detectedWord}"`);
+        
+      } catch (error) {
+        console.error('Error bloqueando usuario:', error);
+      }
+    }
+
+    function showBlockModal(detectedWord, blockUntil) {
+      document.getElementById('offensiveWordDisplay').textContent = detectedWord;
+      document.getElementById('offenseModal').classList.add('active');
+      
+      // Iniciar countdown
+      startBlockCountdown(blockUntil);
+    }
+
+    function startBlockCountdown(blockUntil) {
+      const countdownElement = document.getElementById('offenseCountdown');
+      
+      function updateCountdown() {
+        const now = new Date().getTime();
+        const blockTime = new Date(blockUntil).getTime();
+        const distance = blockTime - now;
+        
+        if (distance > 0) {
+          const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+          
+          countdownElement.textContent = `${days} días ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        } else {
+          countdownElement.textContent = "Bloqueo expirado";
+          // Aquí podrías automaticamente desbloquear al usuario
+        }
+      }
+      
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    }
+
     /* ====================== WEBRTC ====================== */
     async function startLocalStream(){
       try {
@@ -1976,6 +2653,9 @@ username:
     }
     function restartCall(){
       showConnecting();
+      // Reiniciar contador de ofensas al cambiar de usuario
+      offenseCount = 0;
+      
       setTimeout(() => {
         hideConnecting();
         if(peerConnection) peerConnection.close();
@@ -2195,6 +2875,24 @@ username:
         return;
       }
 
+      // Mostrar animación de envío
+      const reportBtn = document.querySelector('.btn-report');
+      const originalText = reportBtn.innerHTML;
+      
+      // Deshabilitar el botón y mostrar spinner
+      reportBtn.disabled = true;
+      reportBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
+      reportBtn.style.opacity = '0.7';
+      
+      // Animación de las opciones desapareciendo
+      const options = document.querySelectorAll('.report-option');
+      options.forEach((option, index) => {
+        setTimeout(() => {
+          option.style.transform = 'translateX(-100%)';
+          option.style.opacity = '0';
+        }, index * 100);
+      });
+
       const reportData = {
         tipo: selectedReportOption,
         reporter: currentUser ? currentUser.uid : "desconocido",
@@ -2202,17 +2900,105 @@ username:
         riskScore: RISK_SCORES[selectedReportOption] || 0
       };
 
-      database.ref('reports/' + remoteUidGlobal).push(reportData)
-        .then(() => {
-          document.getElementById('reportStatus').innerHTML = "<p style='color:green;'>Reporte enviado correctamente</p>";
-          setTimeout(() => {
-            closeReportModal();
-          }, 2000);
-        })
-        .catch(err => {
-          console.error("Error en el reporte:", err);
-          document.getElementById('reportStatus').innerHTML = "<p style='color:red;'>Error al enviar el reporte</p>";
+      // Simular delay para mostrar animaciones
+      setTimeout(() => {
+        database.ref('reports/' + remoteUidGlobal).push(reportData)
+          .then(() => {
+            // Animación de éxito
+            reportBtn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Enviado!';
+            reportBtn.style.background = 'var(--success-color)';
+            reportBtn.style.opacity = '1';
+            
+            // Mostrar mensaje de éxito con animación
+            const statusEl = document.getElementById('reportStatus');
+            statusEl.innerHTML = `
+              <div class="report-success-message">
+                <i class="fa-solid fa-check-circle"></i>
+                <p>¡Gracias por reportar!</p>
+                <p>Hemos recibido tu reporte y lo revisaremos pronto.</p>
+              </div>
+            `;
+            
+            // Animar la aparición del mensaje
+            const successMsg = statusEl.querySelector('.report-success-message');
+            successMsg.style.opacity = '0';
+            successMsg.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+              successMsg.style.transition = 'all 0.3s ease';
+              successMsg.style.opacity = '1';
+              successMsg.style.transform = 'translateY(0)';
+            }, 100);
+            
+            // Cerrar modal con animación
+            setTimeout(() => {
+              closeReportModalWithAnimation();
+            }, 2500);
+          })
+          .catch(err => {
+            console.error("Error en el reporte:", err);
+            
+            // Animación de error
+            reportBtn.innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i> Error';
+            reportBtn.style.background = 'var(--danger-color)';
+            
+            document.getElementById('reportStatus').innerHTML = `
+              <div class="report-error-message">
+                <i class="fa-solid fa-exclamation-circle"></i>
+                <p style='color:var(--danger-color);'>Error al enviar el reporte</p>
+                <p style='color:var(--gray-text);'>Por favor, inténtalo de nuevo</p>
+              </div>
+            `;
+            
+            // Restaurar botón después de 3 segundos
+            setTimeout(() => {
+              reportBtn.disabled = false;
+              reportBtn.innerHTML = originalText;
+              reportBtn.style.background = 'var(--danger-color)';
+              reportBtn.style.opacity = '1';
+              
+              // Restaurar opciones
+              options.forEach((option, index) => {
+                setTimeout(() => {
+                  option.style.transform = 'translateX(0)';
+                  option.style.opacity = '1';
+                }, index * 50);
+              });
+            }, 3000);
+          });
+      }, 1000);
+    }
+
+    function closeReportModalWithAnimation() {
+      const modal = document.getElementById('reportModal');
+      const content = modal.querySelector('.report-content');
+      
+      // Animación de salida
+      content.style.transform = 'scale(0.95) translateY(20px)';
+      content.style.opacity = '0';
+      modal.style.opacity = '0';
+      
+      setTimeout(() => {
+        closeReportModal();
+        
+        // Resetear estilos para próxima vez
+        content.style.transform = '';
+        content.style.opacity = '';
+        modal.style.opacity = '';
+        
+        const reportBtn = document.querySelector('.btn-report');
+        reportBtn.disabled = false;
+        reportBtn.innerHTML = 'Reportar';
+        reportBtn.style.background = 'var(--danger-color)';
+        reportBtn.style.opacity = '1';
+        
+        // Resetear opciones
+        const options = document.querySelectorAll('.report-option');
+        options.forEach(option => {
+          option.style.transform = '';
+          option.style.opacity = '';
         });
+      }, 300);
     }
 
     /* ====================== FUNCIONES DE USUARIO ====================== */
