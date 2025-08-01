@@ -2530,10 +2530,7 @@ username:
       auth.signInWithEmailAndPassword(email, password)
         .then(userCredential => {
           console.log("Login exitoso:", userCredential.user);
-          // **Mantengo tu línea original** (no quito nada):
-          goToScreen('profileSetupScreen');
-          // Luego, el onAuthStateChanged se ejecutará y si el perfil ya está completo,
-          // redirigirá a la videollamada. (Esto "sobreescribe" el screen anterior).
+          // El onAuthStateChanged se ejecutará automáticamente y redirigirá según el estado del perfil
         })
         .catch(error => alert("Error al iniciar sesión: " + error.message));
     }
@@ -2546,6 +2543,8 @@ username:
         database.ref('profiles/' + user.uid).once('value', snapshot => {
           if(snapshot.exists()){
             currentProfile = snapshot.val();
+            console.log("Perfil cargado:", currentProfile);
+            
             // Chequeo si está bloqueado
             if(currentProfile.blockedUntil){
               const now = new Date();
@@ -2561,19 +2560,23 @@ username:
                 return;
               }
             }
-            // Si ya tiene username, avatar y country, está completo
-            if(currentProfile.username && currentProfile.avatar_url && currentProfile.country){
-              // Vamos a videollamada (sobreescribe la pantalla anterior)
+            
+            // Si ya tiene todos los datos necesarios, ir directo a videollamada
+            if(currentProfile.username && currentProfile.country){
+              console.log("Perfil completo, yendo a videollamada");
               goToScreen('videoCallScreen');
-            } else if(currentProfile.username && currentProfile.avatar_url && !currentProfile.country) {
-              // Si tiene perfil pero no país, ir a selección de país
+            } else if(currentProfile.username && !currentProfile.country) {
+              // Si tiene nombre pero no país, ir a selección de país
+              console.log("Falta país, yendo a selección de país");
               goToScreen('countryScreen');
             } else {
-              // Sino, al profileSetupScreen
+              // Si no tiene nombre, ir a configuración de perfil
+              console.log("Perfil incompleto, yendo a setup");
               goToScreen('profileSetupScreen');
             }
           } else {
             // No existe su perfil en la DB, lo mandamos a la configuración
+            console.log("No hay perfil, yendo a setup");
             goToScreen('profileSetupScreen');
           }
         });
@@ -2719,12 +2722,16 @@ username:
         const profileData = {
           username: username,
           birthDate: "2000-01-01", // Fecha por defecto para adultos
-          country: window.tempRegistrationCountry || "ES", // País del registro o España por defecto
           followersCount: 0,
           verified: false,
           createdAt: firebase.database.ServerValue.TIMESTAMP,
           lastUpdated: firebase.database.ServerValue.TIMESTAMP
         };
+        
+        // Si ya tenemos el país del registro, incluirlo
+        if(window.tempRegistrationCountry) {
+          profileData.country = window.tempRegistrationCountry;
+        }
         
         // Manejar avatar
         const avatarEl = document.getElementById('avatarPreview');
@@ -2743,7 +2750,13 @@ username:
         currentProfile = profileData;
         
         console.log("Perfil guardado exitosamente");
-        goToScreen('countryScreen');
+        
+        // Si ya tiene país, ir directo a videollamada, sino a selección de país
+        if(profileData.country) {
+          goToScreen('videoCallScreen');
+        } else {
+          goToScreen('countryScreen');
+        }
         
       } catch(error) {
         console.error("Error saving profile:", error);
