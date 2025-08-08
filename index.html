@@ -2583,14 +2583,28 @@ username:
 
     /* ====================== MANEJO DE PANTALLAS ====================== */
     function goToScreen(screenId) {
-      // Prevenir cambios de pantalla no autorizados
-      if (!screenId || typeof screenId !== 'string') return;
+      console.log('Navegando a pantalla:', screenId);
       
-      document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+      // Prevenir cambios de pantalla no autorizados
+      if (!screenId || typeof screenId !== 'string') {
+        console.error('ID de pantalla inválido:', screenId);
+        return;
+      }
+      
+      // Remover clase active de todas las pantallas
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+      });
+      
+      // Activar la pantalla objetivo
       const targetScreen = document.getElementById(screenId);
-      if (!targetScreen) return;
+      if (!targetScreen) {
+        console.error('Pantalla no encontrada:', screenId);
+        return;
+      }
       
       targetScreen.classList.add('active');
+      console.log('Pantalla activada:', screenId);
       
       // La marca de agua se maneja automáticamente con CSS
       // Auto-detectar país si es la screen "countryScreen"
@@ -2600,8 +2614,10 @@ username:
       // Si es videoCallScreen, iniciamos streaming + matching
       if(screenId === 'videoCallScreen'){
         // Mostrar íconos de reporte y estado de cuenta solo en videollamada
-        document.querySelector('.account-status-icon').style.display = 'flex';
-        document.querySelector('.report-icon').style.display = 'flex';
+        const accountIcon = document.querySelector('.account-status-icon');
+        const reportIcon = document.querySelector('.report-icon');
+        if(accountIcon) accountIcon.style.display = 'flex';
+        if(reportIcon) reportIcon.style.display = 'flex';
         
         startLocalStream();
         showConnecting();
@@ -2612,12 +2628,15 @@ username:
         }, 2000);
       } else {
         // Ocultar íconos y detener monitoreo si salimos de la videollamada
-        document.querySelector('.account-status-icon').style.display = 'none';
-        document.querySelector('.report-icon').style.display = 'none';
+        const accountIcon = document.querySelector('.account-status-icon');
+        const reportIcon = document.querySelector('.report-icon');
+        if(accountIcon) accountIcon.style.display = 'none';
+        if(reportIcon) reportIcon.style.display = 'none';
         stopSpeechMonitoring();
       }
     }
     function toggleForm(formType) {
+      console.log('Cambiando a formulario:', formType);
       if(formType === 'registerForm'){
         goToScreen('registerScreen');
       } else if(formType === 'forgotPasswordForm'){
@@ -2627,18 +2646,30 @@ username:
     
     // Función para enviar enlace de recuperación de contraseña
     function sendPasswordReset() {
-      const email = document.getElementById('resetEmail').value;
+      console.log('Enviando recuperación de contraseña');
+      const emailInput = document.getElementById('resetEmail');
+      if (!emailInput) {
+        console.error('Campo de email no encontrado');
+        alert('Error en el formulario');
+        return;
+      }
+      
+      const email = emailInput.value.trim();
       if (!email) {
         alert('Por favor ingresa tu correo electrónico');
         return;
       }
       
+      console.log('Enviando email de recuperación a:', email);
+      
       firebase.auth().sendPasswordResetEmail(email)
         .then(() => {
+          console.log('Email de recuperación enviado exitosamente');
           alert('Enlace de recuperación enviado a tu correo electrónico');
           goToScreen('loginScreen');
         })
         .catch(error => {
+          console.error('Error enviando email de recuperación:', error);
           let mensaje = "Error al enviar el enlace";
           switch(error.code) {
             case 'auth/user-not-found':
@@ -2647,6 +2678,9 @@ username:
             case 'auth/invalid-email':
               mensaje = "Correo electrónico inválido";
               break;
+            case 'auth/too-many-requests':
+              mensaje = "Demasiados intentos. Inténtalo más tarde";
+              break;
           }
           alert(mensaje);
         });
@@ -2654,13 +2688,33 @@ username:
 
     /* ====================== REGISTRO / LOGIN ====================== */
     function registerUser() {
-      const email = document.getElementById('registerEmail').value;
-      const password = document.getElementById('registerPassword').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      const country = document.getElementById('registerCountry').value;
+      console.log('Iniciando proceso de registro');
+      
+      const emailInput = document.getElementById('registerEmail');
+      const passwordInput = document.getElementById('registerPassword');
+      const confirmPasswordInput = document.getElementById('confirmPassword');
+      const countryInput = document.getElementById('registerCountry');
+
+      if (!emailInput || !passwordInput || !confirmPasswordInput || !countryInput) {
+        console.error('Campos del formulario no encontrados');
+        alert("Error en el formulario de registro");
+        return;
+      }
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+      const country = countryInput.value;
+
+      console.log('Datos del registro:', { email, country, passwordLength: password.length });
 
       if(!email || !password) {
         alert("Por favor completa todos los campos");
+        return;
+      }
+
+      if(password.length < 6) {
+        alert("La contraseña debe tener al menos 6 caracteres");
         return;
       }
 
@@ -2673,6 +2727,8 @@ username:
         alert("Por favor selecciona tu país");
         return;
       }
+
+      console.log('Creando usuario en Firebase...');
 
       firebase.auth().createUserWithEmailAndPassword(email, password)
         .then(userCredential => {
@@ -2696,7 +2752,7 @@ username:
               mensaje = "El registro por email no está habilitado";
               break;
             case 'auth/weak-password':
-              mensaje = "La contraseña es muy débil";
+              mensaje = "La contraseña es muy débil (mínimo 6 caracteres)";
               break;
             case 'auth/configuration-not-found':
               mensaje = "Error de configuración de Firebase. Por favor, inténtalo más tarde";
@@ -2707,14 +2763,53 @@ username:
     }
 
     function loginUser() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+      console.log('Iniciando proceso de login');
+      
+      const emailInput = document.getElementById('email');
+      const passwordInput = document.getElementById('password');
+      
+      if (!emailInput || !passwordInput) {
+        console.error('Campos del formulario de login no encontrados');
+        alert("Error en el formulario de login");
+        return;
+      }
+      
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      
+      console.log('Datos del login:', { email, passwordLength: password.length });
+      
+      if (!email || !password) {
+        alert("Por favor completa todos los campos");
+        return;
+      }
+      
+      console.log('Autenticando con Firebase...');
+      
       auth.signInWithEmailAndPassword(email, password)
         .then(userCredential => {
           console.log("Login exitoso:", userCredential.user);
           // El onAuthStateChanged se ejecutará automáticamente y redirigirá según el estado del perfil
         })
-        .catch(error => alert("Error al iniciar sesión: " + error.message));
+        .catch(error => {
+          console.error("Error de login:", error);
+          let mensaje = "Error al iniciar sesión";
+          switch(error.code) {
+            case 'auth/user-not-found':
+              mensaje = "No existe una cuenta con este correo";
+              break;
+            case 'auth/wrong-password':
+              mensaje = "Contraseña incorrecta";
+              break;
+            case 'auth/invalid-email':
+              mensaje = "Correo electrónico inválido";
+              break;
+            case 'auth/too-many-requests':
+              mensaje = "Demasiados intentos. Inténtalo más tarde";
+              break;
+          }
+          alert(mensaje);
+        });
     }
 
     // Observador de autenticación (para corregir que no pida reconfigurar el perfil si ya está completo)
