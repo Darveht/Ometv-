@@ -137,16 +137,24 @@
     #loginScreen,
     #registerScreen,
     #forgotPasswordScreen {
-      background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        transparent 50%,
-        var(--background) 50%,
-        var(--background) 100%
-      ), url('https://i.ibb.co/6JfZ1mW9/IMG-5989.png');
-      background-size: 100% 50%, 100% 50%;
-      background-position: top, top;
-      background-repeat: no-repeat, no-repeat;
+      position: relative;
+      background: var(--background);
+    }
+    
+    #loginScreen::before,
+    #registerScreen::before,
+    #forgotPasswordScreen::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50vh;
+      background: url('https://i.ibb.co/6JfZ1mW9/IMG-5989.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 1;
     }
     .screen.active {
       transform: translateX(0);
@@ -173,17 +181,21 @@
       border-radius: 0;
       box-shadow: none;
       backdrop-filter: none;
-      padding-top: 50vh;
+      padding-top: 52vh;
+      z-index: 5;
+      position: relative;
     }
     
     /* Contenedor específico para el logo en la parte superior */
     .screen-content .logo {
       position: absolute;
-      top: 30%;
+      top: 25vh;
       left: 50%;
       transform: translate(-50%, -50%);
       z-index: 10;
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      text-align: center;
     }
     
     .screen-content .logo h1 {
@@ -203,14 +215,14 @@
     @media (max-width: 768px) {
       .screen-content {
         padding: 0 15px;
-        padding-top: 50vh;
+        padding-top: 52vh;
         min-height: 100vh;
         justify-content: flex-start;
         overflow-y: auto;
       }
       
       .screen-content .logo {
-        top: 25%;
+        top: 22vh;
       }
       
       .form-group {
@@ -1423,7 +1435,7 @@
       .screen-content {
         padding-left: max(10px, env(safe-area-inset-left));
         padding-right: max(10px, env(safe-area-inset-right));
-        padding-top: 50vh;
+        padding-top: 52vh;
       }
     }
     
@@ -1434,7 +1446,7 @@
       }
       
       .screen-content .logo {
-        top: 20%;
+        top: 20vh;
       }
       
       .screen-content .logo p {
@@ -1456,7 +1468,7 @@
       
       .screen-content {
         padding: 0 15px;
-        padding-top: 50vh;
+        padding-top: 52vh;
       }
     }
     
