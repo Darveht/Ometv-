@@ -2605,35 +2605,12 @@ username:
       
       targetScreen.classList.add('active');
       console.log('Pantalla activada:', screenId);
-    }
-
-    // Funciones de navegación específicas para evitar conflictos
-    function navigateToLogin() {
-      console.log('Navegando a login');
-      goToScreen('loginScreen');
-    }
-
-    function navigateToRegister() {
-      console.log('Navegando a registro');
-      goToScreen('registerScreen');
-    }
-
-    function navigateToWelcome() {
-      console.log('Navegando a bienvenida');
-      goToScreen('welcomeScreen');
-    }
-
-    function navigateToForgotPassword() {
-      console.log('Navegando a recuperar contraseña');
-      goToScreen('forgotPasswordScreen');
-    }
       
-      // La marca de agua se maneja automáticamente con CSS
-      // Auto-detectar país si es la screen "countryScreen"
+      // Lógica específica por pantalla
       if(screenId === 'countryScreen'){
         autoDetectCountry();
       }
-      // Si es videoCallScreen, iniciamos streaming + matching
+      
       if(screenId === 'videoCallScreen'){
         // Mostrar íconos de reporte y estado de cuenta solo en videollamada
         const accountIcon = document.querySelector('.account-status-icon');
@@ -2656,6 +2633,27 @@ username:
         if(reportIcon) reportIcon.style.display = 'none';
         stopSpeechMonitoring();
       }
+    }
+
+    // Funciones de navegación específicas para evitar conflictos
+    function navigateToLogin() {
+      console.log('Navegando a login');
+      goToScreen('loginScreen');
+    }
+
+    function navigateToRegister() {
+      console.log('Navegando a registro');
+      goToScreen('registerScreen');
+    }
+
+    function navigateToWelcome() {
+      console.log('Navegando a bienvenida');
+      goToScreen('welcomeScreen');
+    }
+
+    function navigateToForgotPassword() {
+      console.log('Navegando a recuperar contraseña');
+      goToScreen('forgotPasswordScreen');
     }
     function toggleForm(formType) {
       console.log('Cambiando a formulario:', formType);
@@ -2834,11 +2832,14 @@ username:
         });
     }
 
-    // Observador de autenticación (para corregir que no pida reconfigurar el perfil si ya está completo)
+    // Observador de autenticación
     auth.onAuthStateChanged(user => {
+      console.log("Auth state changed:", user ? "Usuario logueado" : "Usuario deslogueado");
+      
       if(user){
         currentUser = user;
-        console.log("Usuario autenticado:", user.uid);
+        console.log("Usuario autenticado:", user.uid, user.email);
+        
         database.ref('profiles/' + user.uid).once('value', snapshot => {
           if(snapshot.exists()){
             currentProfile = snapshot.val();
@@ -2878,8 +2879,12 @@ username:
             console.log("No hay perfil, yendo a setup");
             goToScreen('profileSetupScreen');
           }
+        }).catch(error => {
+          console.error("Error cargando perfil:", error);
+          goToScreen('profileSetupScreen');
         });
       } else {
+        console.log("No hay usuario autenticado, yendo a welcome");
         currentUser = null;
         currentProfile = null;
         goToScreen('welcomeScreen');
