@@ -12,19 +12,19 @@
   <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-analytics-compat.js"></script>
   <style>
-    /* ====================== ESTILOS TIPO TWITTER ====================== */
+    /* ====================== ESTILOS TIPO DOORDASH ====================== */
     :root {
-      --primary-color: #1D9BF0; /* Twitter Blue */
-      --secondary-color: #1D9BF0; 
-      --background: #000000; /* Twitter Dark Background */
-      --card-bg: #16181C; /* Twitter Card Background */
-      --light-text: #E7E9EA; /* Twitter Light Text */
-      --gray-text: #71767B; /* Twitter Gray Text */
-      --border-color: #2F3336; /* Twitter Border */
-      --hover-bg: #1C1F23; /* Twitter Hover Background */
-      --danger-color: #F4212E; /* Twitter Red */
-      --success-color: #00BA7C; /* Twitter Green */
-      --twitter-blue-hover: #1A8CD8;
+      --primary-color: #FF3008; /* DoorDash Red */
+      --secondary-color: #FF3008; 
+      --background: #FFFFFF; /* DoorDash Light Background */
+      --card-bg: #FAFAFA; /* DoorDash Card Background */
+      --light-text: #191919; /* DoorDash Dark Text */
+      --gray-text: #5C5C5C; /* DoorDash Gray Text */
+      --border-color: #E4E4E7; /* DoorDash Border */
+      --hover-bg: #F8F8F8; /* DoorDash Hover Background */
+      --danger-color: #FF3008; /* DoorDash Red */
+      --success-color: #00C851; /* DoorDash Green */
+      --doordash-orange: #FF6B00;
     }
     html, body {
       margin: 0;
@@ -175,7 +175,10 @@
     }
     .logo h1 {
       font-size: 32px;
-      color: var(--light-text);
+      background: linear-gradient(135deg, #FF3008 0%, #FF6B00 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       font-weight: 900;
       letter-spacing: -0.5px;
       margin-bottom: 8px;
@@ -209,17 +212,19 @@
     input, select {
       width: 100%;
       padding: 15px 15px 15px 45px;
-      border-radius: 6px;
-      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      border: 2px solid var(--border-color);
       background-color: var(--background);
       color: var(--light-text);
       font-size: 16px;
       outline: none;
       transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     input:focus, select:focus {
       border-color: var(--primary-color);
       background-color: var(--card-bg);
+      box-shadow: 0 0 0 3px rgba(255, 48, 8, 0.1);
     }
     input::placeholder {
       color: var(--gray-text);
@@ -240,9 +245,13 @@
     .btn-primary {
       background-color: var(--primary-color);
       color: white;
+      box-shadow: 0 2px 4px rgba(255, 48, 8, 0.2);
+      font-weight: 600;
     }
     .btn-primary:hover {
-      background-color: #1A8CD8;
+      background-color: #E02D07;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(255, 48, 8, 0.3);
     }
     .btn-outline {
       background-color: transparent;
@@ -1556,12 +1565,12 @@
   <!-- Ícono de Estado de Cuenta -->
   <div class="account-status-icon" 
        onclick="openAccountStatusScreen()"
-       style="display: flex;">
+       style="display: none;">
     <i class="fa-solid fa-user-shield"></i>
   </div>
   <!-- Ícono de Reporte -->
   <div class="report-icon" onclick="openReportModal()"
-       style="display: flex;">
+       style="display: none;">
     <i class="fa-solid fa-flag"></i>
   </div>
 
@@ -1587,7 +1596,7 @@
         <form id="loginForm">
           <div class="form-group">
             <label for="email">Correo electrónico</label>
-            <<div class="input-group">
+            <div class="input-group">
               <i class="fa-solid fa-envelope"></i>
               <input type="email" id="email" placeholder="Ingresa tu correo electrónico" required>
             </div>
@@ -2450,6 +2459,10 @@ username:
       }
       // Si es videoCallScreen, iniciamos streaming + matching
       if(screenId === 'videoCallScreen'){
+        // Mostrar íconos de reporte y estado de cuenta solo en videollamada
+        document.querySelector('.account-status-icon').style.display = 'flex';
+        document.querySelector('.report-icon').style.display = 'flex';
+        
         startLocalStream();
         showConnecting();
         startMatching();
@@ -2458,7 +2471,9 @@ username:
           startSpeechMonitoring();
         }, 2000);
       } else {
-        // Detener monitoreo si salimos de la videollamada
+        // Ocultar íconos y detener monitoreo si salimos de la videollamada
+        document.querySelector('.account-status-icon').style.display = 'none';
+        document.querySelector('.report-icon').style.display = 'none';
         stopSpeechMonitoring();
       }
     }
