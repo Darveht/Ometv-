@@ -133,17 +133,20 @@
       -webkit-overflow-scrolling: touch;
     }
     
-    /* Fondo difuminado para pantallas de login/registro */
+    /* Fondo para pantallas de login/registro */
     #loginScreen,
     #registerScreen,
     #forgotPasswordScreen {
-      background: 
-        linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)),
-        url('https://i.ibb.co/6JfZ1mW9/IMG-5989.png');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      backdrop-filter: blur(3px);
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        transparent 50%,
+        var(--background) 50%,
+        var(--background) 100%
+      ), url('https://i.ibb.co/6JfZ1mW9/IMG-5989.png');
+      background-size: 100% 50%, 100% 50%;
+      background-position: top, top;
+      background-repeat: no-repeat, no-repeat;
     }
     .screen.active {
       transform: translateX(0);
@@ -159,32 +162,55 @@
       width: 100%;
       max-width: 380px;
       margin: 0 auto;
-      padding: 40px 20px;
+      padding: 0 20px;
       text-align: center;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
       box-sizing: border-box;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 16px;
-      box-shadow: var(--pinterest-shadow);
-      backdrop-filter: blur(10px);
-      margin-top: 20px;
-      margin-bottom: 20px;
-      min-height: calc(100vh - 40px);
+      background: transparent;
+      border-radius: 0;
+      box-shadow: none;
+      backdrop-filter: none;
+      padding-top: 50vh;
+    }
+    
+    /* Contenedor específico para el logo en la parte superior */
+    .screen-content .logo {
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .screen-content .logo h1 {
+      color: white;
+      background: none;
+      -webkit-background-clip: initial;
+      -webkit-text-fill-color: initial;
+      background-clip: initial;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    .screen-content .logo p {
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
     }
     
     @media (max-width: 768px) {
       .screen-content {
-        padding: 20px 15px;
+        padding: 0 15px;
+        padding-top: 50vh;
         min-height: 100vh;
-        justify-content: center;
+        justify-content: flex-start;
         overflow-y: auto;
       }
       
-      .logo {
-        margin-bottom: 25px;
+      .screen-content .logo {
+        top: 25%;
       }
       
       .form-group {
@@ -1397,53 +1423,40 @@
       .screen-content {
         padding-left: max(10px, env(safe-area-inset-left));
         padding-right: max(10px, env(safe-area-inset-right));
+        padding-top: 50vh;
       }
     }
     
     @media (max-width: 480px) {
-      .logo h1 {
-        font-size: 26px;
-        margin-bottom: 3px;
-        margin-top: 0;
-        padding-top: 0;
-      }
-      
-      .logo {
-        margin-top: 0;
+      .screen-content .logo h1 {
+        font-size: 32px;
         margin-bottom: 8px;
-        padding-top: 0;
       }
       
-      .logo p {
-        margin-top: 0;
-        margin-bottom: 3px;
-        padding-top: 0;
+      .screen-content .logo {
+        top: 20%;
+      }
+      
+      .screen-content .logo p {
+        font-size: 14px;
       }
       
       .form-group {
-        margin-bottom: 8px;
-        margin-top: 0;
+        margin-bottom: 12px;
       }
       
       .social-login {
-        margin-bottom: 8px;
-        margin-top: 0;
+        margin-bottom: 12px;
       }
       
       input, select {
         font-size: 16px; /* Previene zoom en iOS */
-        padding: 10px 10px 10px 35px;
+        padding: 12px 12px 12px 40px;
       }
       
       .screen-content {
-        padding: 0 10px;
-        padding-top: 0;
-        margin-top: 0;
-      }
-      
-      .screen-content > *:first-child {
-        margin-top: 0 !important;
-        padding-top: 0 !important;
+        padding: 0 15px;
+        padding-top: 50vh;
       }
     }
     
