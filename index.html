@@ -186,6 +186,12 @@
       position: relative;
     }
     
+    /* Para la pantalla de bienvenida, centrar el contenido */
+    #welcomeScreen .screen-content {
+      justify-content: center;
+      padding-top: 20vh;
+    }
+    
     /* Contenedor específico para el logo en la parte superior */
     .screen-content .logo {
       position: absolute;
@@ -230,7 +236,12 @@
       }
     }
     .logo {
-      margin-bottom: 30px;
+      margin-bottom: 24px;
+    }
+    
+    /* Logo más compacto en pantalla de bienvenida */
+    #welcomeScreen .logo {
+      margin-bottom: 20px;
     }
     .logo h1 {
       font-size: 36px;
@@ -250,7 +261,7 @@
       font-weight: 500;
     }
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       text-align: left;
     }
     .form-group label {
@@ -1639,53 +1650,98 @@
 
   <div class="container">
     <!-- PANTALLAS: LOGIN, REGISTRO, RECUPERAR, PERFIL, FECHA NACIMIENTO, PAÍS, VIDEOLLAMADA, BLOQUEADO -->
-    <div class="screen active" id="loginScreen">
+    <!-- PANTALLA INICIAL: SELECCIONAR ACCIÓN -->
+    <div class="screen active" id="welcomeScreen">
       <div class="screen-content">
         <div class="logo">
           <h1>BealyChat</h1>
           <p>Conecta con personas de todo el mundo</p>
         </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 40px;">
+          <button type="button" class="btn btn-primary" onclick="goToScreen('loginScreen')">
+            <i class="fa-solid fa-sign-in-alt" style="margin-right: 8px;"></i>
+            Iniciar Sesión
+          </button>
+          
+          <button type="button" class="btn btn-outline" onclick="goToScreen('registerScreen')">
+            <i class="fa-solid fa-user-plus" style="margin-right: 8px;"></i>
+            Crear Cuenta Nueva
+          </button>
+        </div>
+        
+        <div class="footer">
+          <p>Al continuar, aceptas nuestros términos y condiciones</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANTALLA: INICIAR SESIÓN -->
+    <div class="screen" id="loginScreen">
+      <div class="screen-content">
+        <div class="logo">
+          <h1>BealyChat</h1>
+          <p>Inicia sesión en tu cuenta</p>
+        </div>
+        
         <form id="loginForm">
           <div class="form-group">
             <label for="email">Correo electrónico</label>
             <div class="input-group">
               <i class="fa-solid fa-envelope"></i>
-              <input type="email" id="email" placeholder="Ingresa tu correo electrónico" required>
+              <input type="email" id="email" placeholder="tu@email.com" required>
             </div>
           </div>
+          
           <div class="form-group">
             <label for="password">Contraseña</label>
-            <div class="input-group" style="position: relative;">
+            <div class="input-group">
               <i class="fa-solid fa-lock"></i>
-              <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
+              <input type="password" id="password" placeholder="Tu contraseña" required>
             </div>
           </div>
-          <button type="button" class="btn btn-primary" onclick="loginUser()">Iniciar Sesión</button>
+          
+          <button type="button" class="btn btn-primary" onclick="loginUser()">
+            <i class="fa-solid fa-sign-in-alt" style="margin-right: 8px;"></i>
+            Iniciar Sesión
+          </button>
         </form>
-        <div class="links">
-          <a href="#" onclick="toggleForm('forgotPasswordForm')">¿Olvidaste tu contraseña?</a>
+        
+        <div class="links" style="margin: 20px 0;">
+          <a href="#" onclick="goToScreen('forgotPasswordScreen')" style="color: var(--secondary-color);">
+            <i class="fa-solid fa-key" style="margin-right: 4px;"></i>
+            ¿Olvidaste tu contraseña?
+          </a>
         </div>
         
-        <div>
-          <p>¿No tienes una cuenta? <a href="#" onclick="toggleForm('registerForm')" style="color: var(--secondary-color);">Regístrate</a></p>
+        <div class="divider">
+          <span>o</span>
         </div>
+        
+        <button type="button" class="btn btn-outline" onclick="goToScreen('welcomeScreen')">
+          <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i>
+          Volver
+        </button>
       </div>
     </div>
 
+    <!-- PANTALLA: REGISTRARSE -->
     <div class="screen" id="registerScreen">
       <div class="screen-content">
         <div class="logo">
           <h1>BealyChat</h1>
-          <p>Crea tu cuenta</p>
+          <p>Crea tu cuenta nueva</p>
         </div>
+        
         <form id="registerForm">
           <div class="form-group">
             <label for="registerEmail">Correo electrónico</label>
             <div class="input-group">
               <i class="fa-solid fa-envelope"></i>
-              <input type="email" id="registerEmail" placeholder="Ingresa tu correo electrónico" required>
+              <input type="email" id="registerEmail" placeholder="tu@email.com" required>
             </div>
           </div>
+          
           <div class="form-group">
             <label for="registerPassword">Contraseña</label>
             <div class="input-group" style="position: relative;">
@@ -1695,6 +1751,7 @@
                    style="display: none; position: absolute; top: -20px; right: 10px; width: 30px;">
             </div>
           </div>
+          
           <div class="form-group">
             <label for="confirmPassword">Confirmar contraseña</label>
             <div class="input-group" style="position: relative;">
@@ -1704,6 +1761,7 @@
                    style="display: none; position: absolute; top: -20px; right: 10px; width: 30px;">
             </div>
           </div>
+          
           <div class="form-group">
             <label for="registerCountry">País</label>
             <div class="input-group">
@@ -1715,32 +1773,62 @@
               <div class="country-list" id="countryList"></div>
             </div>
           </div>
-          <button type="button" class="btn btn-primary" onclick="registerUser()">Registrarse</button>
+          
+          <button type="button" class="btn btn-primary" onclick="registerUser()">
+            <i class="fa-solid fa-user-plus" style="margin-right: 8px;"></i>
+            Crear Cuenta
+          </button>
         </form>
         
-        <div>
-          <p>¿Ya tienes una cuenta? <a href="#" onclick="goToScreen('loginScreen')" style="color: var(--secondary-color);">Inicia sesión</a></p>
+        <div class="divider">
+          <span>o</span>
         </div>
+        
+        <button type="button" class="btn btn-outline" onclick="goToScreen('welcomeScreen')">
+          <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i>
+          Volver
+        </button>
       </div>
     </div>
 
+    <!-- PANTALLA: RECUPERAR CONTRASEÑA -->
     <div class="screen" id="forgotPasswordScreen">
       <div class="screen-content">
         <div class="logo">
           <h1>BealyChat</h1>
-          <p>Recupera tu contraseña</p>
+          <p>Recuperar contraseña</p>
         </div>
+        
+        <div style="background: var(--card-bg); padding: 16px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border-color);">
+          <i class="fa-solid fa-info-circle" style="color: var(--primary-color); margin-right: 8px;"></i>
+          <span style="font-size: 14px; color: var(--gray-text);">
+            Te enviaremos un enlace para restablecer tu contraseña
+          </span>
+        </div>
+        
         <form id="forgotPasswordForm">
           <div class="form-group">
             <label for="resetEmail">Correo electrónico</label>
             <div class="input-group">
               <i class="fa-solid fa-envelope"></i>
-              <input type="email" id="resetEmail" placeholder="Ingresa tu correo electrónico" required>
+              <input type="email" id="resetEmail" placeholder="tu@email.com" required>
             </div>
           </div>
-          <button type="button" class="btn btn-primary">Enviar enlace de recuperación</button>
-          <button type="button" class="btn btn-outline mt-3" onclick="goToScreen('loginScreen')">Volver a iniciar sesión</button>
+          
+          <button type="button" class="btn btn-primary" onclick="sendPasswordReset()">
+            <i class="fa-solid fa-paper-plane" style="margin-right: 8px;"></i>
+            Enviar Enlace
+          </button>
         </form>
+        
+        <div class="divider">
+          <span>o</span>
+        </div>
+        
+        <button type="button" class="btn btn-outline" onclick="goToScreen('loginScreen')">
+          <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i>
+          Volver al Login
+        </button>
       </div>
     </div>
 
@@ -2536,6 +2624,33 @@ username:
         goToScreen('forgotPasswordScreen');
       }
     }
+    
+    // Función para enviar enlace de recuperación de contraseña
+    function sendPasswordReset() {
+      const email = document.getElementById('resetEmail').value;
+      if (!email) {
+        alert('Por favor ingresa tu correo electrónico');
+        return;
+      }
+      
+      firebase.auth().sendPasswordResetEmail(email)
+        .then(() => {
+          alert('Enlace de recuperación enviado a tu correo electrónico');
+          goToScreen('loginScreen');
+        })
+        .catch(error => {
+          let mensaje = "Error al enviar el enlace";
+          switch(error.code) {
+            case 'auth/user-not-found':
+              mensaje = "No existe una cuenta con este correo";
+              break;
+            case 'auth/invalid-email':
+              mensaje = "Correo electrónico inválido";
+              break;
+          }
+          alert(mensaje);
+        });
+    }
 
     /* ====================== REGISTRO / LOGIN ====================== */
     function registerUser() {
@@ -2650,7 +2765,7 @@ username:
       } else {
         currentUser = null;
         currentProfile = null;
-        goToScreen('loginScreen');
+        goToScreen('welcomeScreen');
       }
     });
 
