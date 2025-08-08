@@ -1659,12 +1659,12 @@
         </div>
         
         <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 40px;">
-          <button type="button" class="btn btn-primary" onclick="goToScreen('loginScreen')">
+          <button type="button" class="btn btn-primary" onclick="navigateToLogin()">
             <i class="fa-solid fa-sign-in-alt" style="margin-right: 8px;"></i>
             Iniciar Sesión
           </button>
           
-          <button type="button" class="btn btn-outline" onclick="goToScreen('registerScreen')">
+          <button type="button" class="btn btn-outline" onclick="navigateToRegister()">
             <i class="fa-solid fa-user-plus" style="margin-right: 8px;"></i>
             Crear Cuenta Nueva
           </button>
@@ -1708,7 +1708,7 @@
         </form>
         
         <div class="links" style="margin: 20px 0;">
-          <a href="#" onclick="goToScreen('forgotPasswordScreen')" style="color: var(--secondary-color);">
+          <a href="#" onclick="navigateToForgotPassword()" style="color: var(--secondary-color);">
             <i class="fa-solid fa-key" style="margin-right: 4px;"></i>
             ¿Olvidaste tu contraseña?
           </a>
@@ -1718,7 +1718,7 @@
           <span>o</span>
         </div>
         
-        <button type="button" class="btn btn-outline" onclick="goToScreen('welcomeScreen')">
+        <button type="button" class="btn btn-outline" onclick="navigateToWelcome()">
           <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i>
           Volver
         </button>
@@ -1784,7 +1784,7 @@
           <span>o</span>
         </div>
         
-        <button type="button" class="btn btn-outline" onclick="goToScreen('welcomeScreen')">
+        <button type="button" class="btn btn-outline" onclick="navigateToWelcome()">
           <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i>
           Volver
         </button>
@@ -1825,7 +1825,7 @@
           <span>o</span>
         </div>
         
-        <button type="button" class="btn btn-outline" onclick="goToScreen('loginScreen')">
+        <button type="button" class="btn btn-outline" onclick="navigateToLogin()">
           <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i>
           Volver al Login
         </button>
@@ -2605,6 +2605,28 @@ username:
       
       targetScreen.classList.add('active');
       console.log('Pantalla activada:', screenId);
+    }
+
+    // Funciones de navegación específicas para evitar conflictos
+    function navigateToLogin() {
+      console.log('Navegando a login');
+      goToScreen('loginScreen');
+    }
+
+    function navigateToRegister() {
+      console.log('Navegando a registro');
+      goToScreen('registerScreen');
+    }
+
+    function navigateToWelcome() {
+      console.log('Navegando a bienvenida');
+      goToScreen('welcomeScreen');
+    }
+
+    function navigateToForgotPassword() {
+      console.log('Navegando a recuperar contraseña');
+      goToScreen('forgotPasswordScreen');
+    }
       
       // La marca de agua se maneja automáticamente con CSS
       // Auto-detectar país si es la screen "countryScreen"
@@ -2666,7 +2688,7 @@ username:
         .then(() => {
           console.log('Email de recuperación enviado exitosamente');
           alert('Enlace de recuperación enviado a tu correo electrónico');
-          goToScreen('loginScreen');
+          navigateToLogin();
         })
         .catch(error => {
           console.error('Error enviando email de recuperación:', error);
