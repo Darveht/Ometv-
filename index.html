@@ -2566,9 +2566,16 @@ username:
       const hiddenInput = document.getElementById('registerCountry');
       const dropdown = document.getElementById('countryDropdown');
       
+      if (!searchInput || !hiddenInput || !dropdown) {
+        console.error('Elementos del country selector no encontrados');
+        return;
+      }
+      
       searchInput.value = `${flag} ${name}`;
       hiddenInput.value = code;
       dropdown.style.display = 'none';
+      
+      console.log('País seleccionado:', { code, name, flag });
     }
 
     // Cerrar dropdown al hacer clic fuera
@@ -2680,12 +2687,17 @@ username:
         return;
       }
       
+      if (!email.includes('@') || email.length < 5) {
+        alert('Por favor ingresa un correo electrónico válido');
+        return;
+      }
+      
       console.log('Enviando email de recuperación a:', email);
       
-      firebase.auth().sendPasswordResetEmail(email)
+      auth.sendPasswordResetEmail(email)
         .then(() => {
           console.log('Email de recuperación enviado exitosamente');
-          alert('Enlace de recuperación enviado a tu correo electrónico');
+          alert('Enlace de recuperación enviado a tu correo electrónico. Revisa tu bandeja de entrada y spam.');
           navigateToLogin();
         })
         .catch(error => {
@@ -2693,13 +2705,16 @@ username:
           let mensaje = "Error al enviar el enlace";
           switch(error.code) {
             case 'auth/user-not-found':
-              mensaje = "No existe una cuenta con este correo";
+              mensaje = "No existe una cuenta con este correo electrónico";
               break;
             case 'auth/invalid-email':
               mensaje = "Correo electrónico inválido";
               break;
             case 'auth/too-many-requests':
               mensaje = "Demasiados intentos. Inténtalo más tarde";
+              break;
+            case 'auth/network-request-failed':
+              mensaje = "Error de conexión. Verifica tu internet";
               break;
           }
           alert(mensaje);
@@ -2750,13 +2765,14 @@ username:
 
       console.log('Creando usuario en Firebase...');
 
-      firebase.auth().createUserWithEmailAndPassword(email, password)
+      auth.createUserWithEmailAndPassword(email, password)
         .then(userCredential => {
           console.log("Registro exitoso:", userCredential.user);
           // Guardar el país seleccionado temporalmente
           window.tempRegistrationCountry = country;
-          alert("Registro exitoso, completa tu configuración de perfil");
-          goToScreen('profileSetupScreen');
+          console.log("País guardado temporalmente:", country);
+          alert("Registro exitoso, configura tu perfil");
+          // No llamamos a goToScreen aquí, el onAuthStateChanged se encargará
         })
         .catch(error => {
           console.error("Error de registro:", error);
@@ -2774,8 +2790,8 @@ username:
             case 'auth/weak-password':
               mensaje = "La contraseña es muy débil (mínimo 6 caracteres)";
               break;
-            case 'auth/configuration-not-found':
-              mensaje = "Error de configuración de Firebase. Por favor, inténtalo más tarde";
+            case 'auth/network-request-failed':
+              mensaje = "Error de conexión. Verifica tu internet";
               break;
           }
           alert(mensaje);
@@ -2840,49 +2856,54 @@ username:
         currentUser = user;
         console.log("Usuario autenticado:", user.uid, user.email);
         
-        database.ref('profiles/' + user.uid).once('value', snapshot => {
-          if(snapshot.exists()){
-            currentProfile = snapshot.val();
-            console.log("Perfil cargado:", currentProfile);
-            
-            // Chequeo si está bloqueado
-            if(currentProfile.blockedUntil){
-              const now = new Date();
-              const blockedUntil = new Date(currentProfile.blockedUntil);
-              if(now < blockedUntil){
-                // Si es bloqueo por ofensas, mostrar modal especial
-                if(currentProfile.blockReason && currentProfile.blockReason.includes('Lenguaje ofensivo')){
-                  const detectedWord = currentProfile.blockReason.match(/detectado: "(.+?)"/)?.[1] || 'palabra ofensiva';
-                  showBlockModal(detectedWord, blockedUntil);
-                } else {
-                  goToScreen('blockedScreen');
+        // Pequeña pausa para asegurar que Firebase esté completamente inicializado
+        setTimeout(() => {
+          database.ref('profiles/' + user.uid).once('value')
+            .then(snapshot => {
+              if(snapshot.exists()){
+                currentProfile = snapshot.val();
+                console.log("Perfil cargado:", currentProfile);
+                
+                // Chequeo si está bloqueado
+                if(currentProfile.blockedUntil){
+                  const now = new Date();
+                  const blockedUntil = new Date(currentProfile.blockedUntil);
+                  if(now < blockedUntil){
+                    // Si es bloqueo por ofensas, mostrar modal especial
+                    if(currentProfile.blockReason && currentProfile.blockReason.includes('Lenguaje ofensivo')){
+                      const detectedWord = currentProfile.blockReason.match(/detectado: "(.+?)"/)?.[1] || 'palabra ofensiva';
+                      showBlockModal(detectedWord, blockedUntil);
+                    } else {
+                      goToScreen('blockedScreen');
+                    }
+                    return;
+                  }
                 }
-                return;
+                
+                // Si ya tiene todos los datos necesarios, ir directo a videollamada
+                if(currentProfile.username && currentProfile.country){
+                  console.log("Perfil completo, yendo a videollamada");
+                  goToScreen('videoCallScreen');
+                } else if(currentProfile.username && !currentProfile.country) {
+                  // Si tiene nombre pero no país, ir a selección de país
+                  console.log("Falta país, yendo a selección de país");
+                  goToScreen('countryScreen');
+                } else {
+                  // Si no tiene nombre, ir a configuración de perfil
+                  console.log("Perfil incompleto, yendo a setup");
+                  goToScreen('profileSetupScreen');
+                }
+              } else {
+                // No existe su perfil en la DB, lo mandamos a la configuración
+                console.log("No hay perfil, yendo a setup");
+                goToScreen('profileSetupScreen');
               }
-            }
-            
-            // Si ya tiene todos los datos necesarios, ir directo a videollamada
-            if(currentProfile.username && currentProfile.country){
-              console.log("Perfil completo, yendo a videollamada");
-              goToScreen('videoCallScreen');
-            } else if(currentProfile.username && !currentProfile.country) {
-              // Si tiene nombre pero no país, ir a selección de país
-              console.log("Falta país, yendo a selección de país");
-              goToScreen('countryScreen');
-            } else {
-              // Si no tiene nombre, ir a configuración de perfil
-              console.log("Perfil incompleto, yendo a setup");
+            })
+            .catch(error => {
+              console.error("Error cargando perfil:", error);
               goToScreen('profileSetupScreen');
-            }
-          } else {
-            // No existe su perfil en la DB, lo mandamos a la configuración
-            console.log("No hay perfil, yendo a setup");
-            goToScreen('profileSetupScreen');
-          }
-        }).catch(error => {
-          console.error("Error cargando perfil:", error);
-          goToScreen('profileSetupScreen');
-        });
+            });
+        }, 500);
       } else {
         console.log("No hay usuario autenticado, yendo a welcome");
         currentUser = null;
@@ -3035,6 +3056,9 @@ username:
         // Si ya tenemos el país del registro, incluirlo
         if(window.tempRegistrationCountry) {
           profileData.country = window.tempRegistrationCountry;
+          console.log("País del registro incluido:", window.tempRegistrationCountry);
+          // Limpiar la variable temporal
+          delete window.tempRegistrationCountry;
         }
         
         // Manejar avatar
@@ -3057,8 +3081,10 @@ username:
         
         // Si ya tiene país, ir directo a videollamada, sino a selección de país
         if(profileData.country) {
+          console.log("Navegando a videollamada con país:", profileData.country);
           goToScreen('videoCallScreen');
         } else {
+          console.log("Sin país, navegando a selección de país");
           goToScreen('countryScreen');
         }
         
