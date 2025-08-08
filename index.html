@@ -12,19 +12,20 @@
   <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-analytics-compat.js"></script>
   <style>
-    /* ====================== ESTILOS TIPO DOORDASH ====================== */
+    /* ====================== ESTILOS TIPO PINTEREST ====================== */
     :root {
-      --primary-color: #FF3008; /* DoorDash Red */
-      --secondary-color: #FF3008; 
-      --background: #FFFFFF; /* DoorDash Light Background */
-      --card-bg: #FAFAFA; /* DoorDash Card Background */
-      --light-text: #191919; /* DoorDash Dark Text */
-      --gray-text: #5C5C5C; /* DoorDash Gray Text */
-      --border-color: #E4E4E7; /* DoorDash Border */
-      --hover-bg: #F8F8F8; /* DoorDash Hover Background */
-      --danger-color: #FF3008; /* DoorDash Red */
-      --success-color: #00C851; /* DoorDash Green */
-      --doordash-orange: #FF6B00;
+      --primary-color: #E60023; /* Pinterest Red */
+      --secondary-color: #E60023; 
+      --background: #FFFFFF; /* Pinterest White Background */
+      --card-bg: #FFFFFF; /* Pinterest Card Background */
+      --light-text: #211922; /* Pinterest Dark Text */
+      --gray-text: #767676; /* Pinterest Gray Text */
+      --border-color: #EFEFEF; /* Pinterest Border */
+      --hover-bg: #F1F1F1; /* Pinterest Hover Background */
+      --danger-color: #E60023; /* Pinterest Red */
+      --success-color: #00A82F; /* Pinterest Green */
+      --pinterest-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      --pinterest-hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     }
     html, body {
       margin: 0;
@@ -131,6 +132,19 @@
       pointer-events: none;
       -webkit-overflow-scrolling: touch;
     }
+    
+    /* Fondo difuminado para pantallas de login/registro */
+    #loginScreen,
+    #registerScreen,
+    #forgotPasswordScreen {
+      background: 
+        linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)),
+        url('https://i.ibb.co/6JfZ1mW9/IMG-5989.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      backdrop-filter: blur(3px);
+    }
     .screen.active {
       transform: translateX(0);
       pointer-events: auto;
@@ -143,7 +157,7 @@
     }
     .screen-content {
       width: 100%;
-      max-width: 400px;
+      max-width: 380px;
       margin: 0 auto;
       padding: 40px 20px;
       text-align: center;
@@ -152,6 +166,13 @@
       flex-direction: column;
       justify-content: center;
       box-sizing: border-box;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      box-shadow: var(--pinterest-shadow);
+      backdrop-filter: blur(10px);
+      margin-top: 20px;
+      margin-bottom: 20px;
+      min-height: calc(100vh - 40px);
     }
     
     @media (max-width: 768px) {
@@ -174,20 +195,21 @@
       margin-bottom: 30px;
     }
     .logo h1 {
-      font-size: 32px;
-      background: linear-gradient(135deg, #FF3008 0%, #FF6B00 100%);
+      font-size: 36px;
+      background: linear-gradient(135deg, #E60023 0%, #BD081C 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       font-weight: 900;
-      letter-spacing: -0.5px;
-      margin-bottom: 8px;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     .logo p {
-      font-size: 15px;
+      font-size: 16px;
       margin-bottom: 0;
       color: var(--gray-text);
-      font-weight: 400;
+      font-weight: 500;
     }
     .form-group {
       margin-bottom: 20px;
@@ -211,47 +233,48 @@
     }
     input, select {
       width: 100%;
-      padding: 15px 15px 15px 45px;
-      border-radius: 8px;
+      padding: 16px 16px 16px 45px;
+      border-radius: 16px;
       border: 2px solid var(--border-color);
       background-color: var(--background);
       color: var(--light-text);
       font-size: 16px;
       outline: none;
-      transition: all 0.2s ease;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      box-shadow: var(--pinterest-shadow);
     }
     input:focus, select:focus {
       border-color: var(--primary-color);
       background-color: var(--card-bg);
-      box-shadow: 0 0 0 3px rgba(255, 48, 8, 0.1);
+      box-shadow: 0 0 0 4px rgba(230, 0, 35, 0.1);
+      transform: translateY(-1px);
     }
     input::placeholder {
       color: var(--gray-text);
     }
     .btn {
       width: 100%;
-      padding: 15px 24px;
+      padding: 16px 24px;
       border: none;
-      border-radius: 9999px;
-      font-size: 15px;
+      border-radius: 24px;
+      font-size: 16px;
       font-weight: 700;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
       text-align: center;
       margin-top: 20px;
-      min-height: 50px;
+      min-height: 52px;
+      box-shadow: var(--pinterest-shadow);
     }
     .btn-primary {
       background-color: var(--primary-color);
       color: white;
-      box-shadow: 0 2px 4px rgba(255, 48, 8, 0.2);
-      font-weight: 600;
+      font-weight: 700;
     }
     .btn-primary:hover {
-      background-color: #E02D07;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(255, 48, 8, 0.3);
+      background-color: #AD051F;
+      transform: translateY(-2px);
+      box-shadow: var(--pinterest-hover-shadow);
     }
     .btn-outline {
       background-color: transparent;
@@ -273,18 +296,19 @@
     .divider {
       display: flex;
       align-items: center;
-      margin: 30px 0;
+      margin: 32px 0;
     }
     .divider::before, .divider::after {
       content: "";
       flex: 1;
       height: 1px;
-      background-color: #ddd;
+      background-color: var(--border-color);
     }
     .divider span {
-      margin: 0 15px;
+      margin: 0 16px;
       color: var(--gray-text);
       font-size: 14px;
+      font-weight: 500;
     }
     .social-login {
       display: flex;
@@ -293,22 +317,25 @@
       margin-bottom: 30px;
     }
     .social-btn {
-      width: 50px;
-      height: 50px;
-      border-radius: 25px;
+      width: 56px;
+      height: 56px;
+      border-radius: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
       background-color: var(--card-bg);
       color: var(--light-text);
-      font-size: 20px;
-      border: 1px solid var(--border-color);
+      font-size: 22px;
+      border: 2px solid var(--border-color);
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
+      box-shadow: var(--pinterest-shadow);
     }
     .social-btn:hover {
       background-color: var(--hover-bg);
-      border-color: var(--gray-text);
+      border-color: var(--primary-color);
+      transform: translateY(-2px);
+      box-shadow: var(--pinterest-hover-shadow);
     }
     .avatar-upload {
       width: 120px;
