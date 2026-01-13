@@ -448,6 +448,10 @@
       margin: 0;
       padding: 0;
     }
+    /* Quitar efecto espejo solo del video local */
+    .local-video video {
+      transform: scaleX(-1);
+    }
     @media (max-width: 768px) {
       .video-container {
         max-width: 100%;
