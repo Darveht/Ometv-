@@ -2,15 +2,16 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4653147807800151" crossorigin="anonymous"></script>
+  <!-- AdSense removido - agregar con tu propio ID -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=YOUR_ADSENSE_ID" crossorigin="anonymous"></script> -->
   <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,viewport-fit=cover">
   <title>BealyChat - Videollamadas Aleatorias</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Firebase (compat) -->
-  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-analytics-compat.js"></script>
+  <!-- Firebase (compat) con crossorigin para seguridad -->
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app-compat.js" crossorigin="anonymous"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-auth-compat.js" crossorigin="anonymous"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-database-compat.js" crossorigin="anonymous"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-analytics-compat.js" crossorigin="anonymous"></script>
   <style>
     /* ====================== ESTILOS TIPO PINTEREST ====================== */
     :root {
@@ -1637,16 +1638,16 @@
     <i class="fa-solid fa-flag"></i>
   </div>
 
-  <!-- Google AdSense Ad Unit -->
-  <ins class="adsbygoogle"
+  <!-- Google AdSense Ad Unit - Configurar con tus credenciales -->
+  <!-- <ins class="adsbygoogle"
        style="display:block"
-       data-ad-client="ca-pub-4653147807800151"
+       data-ad-client="YOUR_ADSENSE_CLIENT_ID"
        data-ad-slot="YOUR_AD_SLOT_ID"
        data-ad-format="auto"
        data-full-width-responsive="true"></ins>
   <script>
        (adsbygoogle = window.adsbygoogle || []).push({});
-  </script>
+  </script> -->
 
   <div class="container">
     <!-- PANTALLAS: LOGIN, REGISTRO, RECUPERAR, PERFIL, FECHA NACIMIENTO, PAÍS, VIDEOLLAMADA, BLOQUEADO -->
@@ -1897,10 +1898,12 @@
             <video id="remoteVideo" autoplay playsinline></video>
           <!-- Info básica del usuario -->
           <div class="user-info" id="remoteUserInfo">
-            <img id="remoteAvatar" src="/api/placeholder/30/30" alt="User" width="30" height="30">
+            <img id="remoteAvatar" src="https://cdn-icons-png.flaticon.com/512/3237/3237472.png" alt="User" width="30" height="30">
             <span id="remoteName"></span>
             <!-- Indicador de conexión -->
             <span id="connectionIndicator" class="connection-indicator"></span>
+            <!-- Badge verificado -->
+            <span id="remoteVerifiedBadge" style="display:none;">✓</span>
           </div>
           <div class="connecting" id="connectingIndicator">
             <div style="text-align:center;">
@@ -2196,15 +2199,16 @@
 
   <script>
     /* ====================== INICIALIZAR FIREBASE ====================== */
+    // IMPORTANTE: Estas credenciales deben moverse a variables de entorno
     const firebaseConfig = {
-      apiKey: "AIzaSyCFQ_geG0HIv2EZ-bfKc97TJNtf2sdqPzc",
-      authDomain: "clack-koder.firebaseapp.com",
-      databaseURL: "https://clack-koder-default-rtdb.firebaseio.com",
-      projectId: "clack-koder",
-      storageBucket: "clack-koder.firebasestorage.app",
-      messagingSenderId: "478151254938",
-      appId: "1:478151254938:web:e2c00e3a5426bd192b9023",
-      measurementId: "G-P29ME5Z3S1"
+      apiKey: "YOUR_API_KEY_HERE",
+      authDomain: "your-app.firebaseapp.com",
+      databaseURL: "https://your-app.firebaseio.com",
+      projectId: "your-project-id",
+      storageBucket: "your-app.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abcdef",
+      measurementId: "G-XXXXXXXXXX"
     };
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
@@ -2498,11 +2502,9 @@
       iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
         {
-          urls:
-"turn:relay1.expressturn.com:3478",
-username:
-"efMS1DHVA7SM7GJ775", credential:
-"n2IsFT3aam|3waju"
+          urls: "turn:your-turn-server.com:3478",
+          username: "YOUR_USERNAME",
+          credential: "YOUR_CREDENTIAL"
         }
       ]
     };
@@ -3505,18 +3507,23 @@ username:
         database.ref('profiles/' + remoteUid).on('value', userSnap => {
           if(userSnap.exists()){
             const rProfile = userSnap.val();
-            document.getElementById('remoteAvatar').src = rProfile.avatar_url || '/api/placeholder/30/30';
-            let nameText = rProfile.username ? rProfile.username : "";
-            document.getElementById('remoteName').textContent = nameText;
-            if(rProfile.verified){
-              document.getElementById('remoteVerifiedBadge').style.display = 'inline';
-            } else {
-              document.getElementById('remoteVerifiedBadge').style.display = 'none';
+            const avatarEl = document.getElementById('remoteAvatar');
+            const nameEl = document.getElementById('remoteName');
+            const verifiedEl = document.getElementById('remoteVerifiedBadge');
+            
+            if(avatarEl) avatarEl.src = rProfile.avatar_url || 'https://cdn-icons-png.flaticon.com/512/3237/3237472.png';
+            if(nameEl) nameEl.textContent = rProfile.username || "";
+            if(verifiedEl) {
+              verifiedEl.style.display = rProfile.verified ? 'inline' : 'none';
             }
           } else {
-            document.getElementById('remoteName').textContent = "";
-            document.getElementById('remoteAvatar').src = '/api/placeholder/30/30';
-            document.getElementById('remoteVerifiedBadge').style.display = 'none';
+            const avatarEl = document.getElementById('remoteAvatar');
+            const nameEl = document.getElementById('remoteName');
+            const verifiedEl = document.getElementById('remoteVerifiedBadge');
+            
+            if(nameEl) nameEl.textContent = "";
+            if(avatarEl) avatarEl.src = 'https://cdn-icons-png.flaticon.com/512/3237/3237472.png';
+            if(verifiedEl) verifiedEl.style.display = 'none';
           }
         });
       });
@@ -3532,22 +3539,30 @@ username:
       }
     }
     function showConnecting(){
-      document.getElementById('connectingIndicator').classList.add('active');
+      const indicator = document.getElementById('connectingIndicator');
+      if(indicator) indicator.classList.add('active');
     }
     function hideConnecting(){
-      document.getElementById('connectingIndicator').classList.remove('active');
+      const indicator = document.getElementById('connectingIndicator');
+      if(indicator) indicator.classList.remove('active');
     }
     function toggleAudio(){
       if(!localStream) return;
+      const micIcon = document.getElementById('micIcon');
+      if(!micIcon) return;
+      
       localStream.getAudioTracks().forEach(track => track.enabled = !track.enabled);
-      document.getElementById('micIcon').classList.toggle('fa-microphone-slash');
-      document.getElementById('micIcon').classList.toggle('fa-microphone');
+      micIcon.classList.toggle('fa-microphone-slash');
+      micIcon.classList.toggle('fa-microphone');
     }
     function toggleVideo(){
       if(!localStream) return;
+      const videoIcon = document.getElementById('videoIcon');
+      if(!videoIcon) return;
+      
       localStream.getVideoTracks().forEach(track => track.enabled = !track.enabled);
-      document.getElementById('videoIcon').classList.toggle('fa-video-slash');
-      document.getElementById('videoIcon').classList.toggle('fa-video');
+      videoIcon.classList.toggle('fa-video-slash');
+      videoIcon.classList.toggle('fa-video');
     }
     function restartCall(){
       showConnecting();
@@ -3584,11 +3599,16 @@ username:
     /* ====================== MODAL: EDITAR PERFIL ====================== */
     function openProfileModal() {
       if(currentUser && currentProfile) {
-        document.getElementById('avatarPreviewProfile').src = currentProfile.avatar_url || '/api/placeholder/100/100';
-        document.getElementById('usernameProfile').value = currentProfile.username || "";
-        document.getElementById('emailProfile').value = currentUser.email;
+        const avatarEl = document.getElementById('avatarPreviewProfile');
+        const usernameEl = document.getElementById('usernameProfile');
+        const emailEl = document.getElementById('emailProfile');
+        
+        if(avatarEl) avatarEl.src = currentProfile.avatar_url || 'https://cdn-icons-png.flaticon.com/512/3237/3237472.png';
+        if(usernameEl) usernameEl.value = currentProfile.username || "";
+        if(emailEl) emailEl.value = currentUser.email;
       }
-      document.getElementById('profileModal').classList.add('active');
+      const modal = document.getElementById('profileModal');
+      if(modal) modal.classList.add('active');
     }
     function closeProfileModal() {
       document.getElementById('profileModal').classList.remove('active');
