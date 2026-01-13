@@ -168,41 +168,58 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
       box-sizing: border-box;
-      background-color: var(--google-bg);
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
     
-    /* Ajustes para diferentes pantallas */
+    /* Estilos específicos para pantallas de auth estilo Google */
     #loginScreen .screen-content,
     #registerScreen .screen-content,
     #forgotPasswordScreen .screen-content,
     #profileSetupScreen .screen-content,
     #countryScreen .screen-content {
+      background-color: var(--google-bg);
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
       padding: 48px 40px 36px;
+      margin: 40px auto;
       min-height: auto;
+      max-width: 450px;
+    }
+    
+    @media (max-width: 768px) {
+      #loginScreen .screen-content,
+      #registerScreen .screen-content,
+      #forgotPasswordScreen .screen-content,
+      #profileSetupScreen .screen-content,
+      #countryScreen .screen-content {
+        margin: 20px;
+        padding: 32px 24px;
+        box-shadow: none;
+        border: 1px solid var(--google-border);
+      }
     }
     
     @media (max-width: 768px) {
       .screen-content {
         padding: 20px 15px;
         min-height: 100vh;
-        justify-content: center;
+        justify-content: flex-start;
         overflow-y: auto;
       }
       
       .logo {
-        margin-bottom: 25px;
+        margin-bottom: 20px;
+        margin-top: 20px;
       }
       
       .form-group {
-        margin-bottom: 18px;
+        margin-bottom: 16px;
       }
     }
     .logo {
-      margin-bottom: 30px;
+      margin-bottom: 24px;
+      margin-top: 0;
     }
     .logo h1 {
       font-size: 24px;
@@ -213,8 +230,8 @@
     }
     .logo p {
       font-size: 16px;
-      margin-bottom: 24px;
-      color: var(--google-text);
+      margin-bottom: 0;
+      color: var(--google-text-secondary);
       font-weight: 400;
     }
     .form-group {
@@ -1658,7 +1675,7 @@
         <form id="loginForm">
           <div class="form-group">
             <label for="email">Correo electrónico</label>
-            <<div class="input-group">
+            <div class="input-group">
               <i class="fa-solid fa-envelope"></i>
               <input type="email" id="email" placeholder="Ingresa tu correo electrónico" required>
             </div>
