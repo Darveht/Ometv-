@@ -27,24 +27,23 @@
       --google-hover: #f1f3f4;
       --google-focus: #e8f0fe;
       
-      /* Mantener variables para otras secciones */
+      /* Variables unificadas */
       --primary-color: #1a73e8;
       --secondary-color: #1a73e8; 
-      --background: #000000;
-      --card-bg: #16181C;
-      --light-text: #E7E9EA;
-      --gray-text: #71767B;
-      --border-color: #2F3336;
-      --hover-bg: #1C1F23;
-      --danger-color: #F4212E;
-      --success-color: #00BA7C;
-      --twitter-blue-hover: #1A8CD8;
+      --background: #ffffff;
+      --card-bg: #ffffff;
+      --light-text: #202124;
+      --gray-text: #5f6368;
+      --border-color: #dadce0;
+      --hover-bg: #f1f3f4;
+      --danger-color: #d93025;
+      --success-color: #1e8e3e;
     }
     html, body {
       margin: 0;
       padding: 0;
-      background-color: var(--background);
-      color: var(--light-text);
+      background-color: #f5f5f5;
+      color: var(--google-text);
       overflow-x: hidden;
       touch-action: manipulation;
       -webkit-user-select: none;
@@ -137,13 +136,18 @@
       position: fixed;
       top: 0;
       left: 0;
-      background-color: var(--background);
+      background-color: #f5f5f5;
       transition: transform 0.3s ease;
       overflow-y: auto;
       overflow-x: hidden;
       touch-action: auto;
       pointer-events: none;
       -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Fondo oscuro solo para videollamada */
+    #videoCallScreen {
+      background-color: #000000;
     }
     .screen.active {
       transform: translateX(0);
@@ -166,25 +170,19 @@
       flex-direction: column;
       justify-content: center;
       box-sizing: border-box;
-    }
-    
-    /* Estilos específicos para pantallas de login/registro estilo Google */
-    #loginScreen .screen-content,
-    #registerScreen .screen-content,
-    #forgotPasswordScreen .screen-content {
       background-color: var(--google-bg);
       border-radius: 8px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      max-width: 450px;
-      padding: 48px 40px 36px;
-      margin: auto;
-      min-height: auto;
     }
     
-    #loginScreen,
-    #registerScreen,
-    #forgotPasswordScreen {
-      background-color: #f5f5f5;
+    /* Ajustes para diferentes pantallas */
+    #loginScreen .screen-content,
+    #registerScreen .screen-content,
+    #forgotPasswordScreen .screen-content,
+    #profileSetupScreen .screen-content,
+    #countryScreen .screen-content {
+      padding: 48px 40px 36px;
+      min-height: auto;
     }
     
     @media (max-width: 768px) {
@@ -207,37 +205,17 @@
       margin-bottom: 30px;
     }
     .logo h1 {
-      font-size: 32px;
-      color: var(--light-text);
-      font-weight: 900;
-      letter-spacing: -0.5px;
-      margin-bottom: 8px;
-    }
-    .logo p {
-      font-size: 15px;
-      margin-bottom: 0;
-      color: var(--gray-text);
-      font-weight: 400;
-    }
-    
-    /* Logo estilo Google para login/registro */
-    #loginScreen .logo h1,
-    #registerScreen .logo h1,
-    #forgotPasswordScreen .logo h1 {
-      color: var(--google-text);
       font-size: 24px;
+      color: var(--google-text);
       font-weight: 400;
       letter-spacing: 0;
       margin-bottom: 8px;
     }
-    
-    #loginScreen .logo p,
-    #registerScreen .logo p,
-    #forgotPasswordScreen .logo p {
-      color: var(--google-text);
+    .logo p {
       font-size: 16px;
-      font-weight: 400;
       margin-bottom: 24px;
+      color: var(--google-text);
+      font-weight: 400;
     }
     .form-group {
       margin-bottom: 20px;
@@ -246,18 +224,9 @@
     .form-group label {
       display: block;
       margin-bottom: 8px;
-      color: var(--gray-text);
-      font-size: 14px;
-    }
-    
-    /* Labels estilo Google */
-    #loginScreen .form-group label,
-    #registerScreen .form-group label,
-    #forgotPasswordScreen .form-group label {
       color: var(--google-text-secondary);
       font-size: 14px;
       font-weight: 500;
-      margin-bottom: 8px;
     }
     .input-group {
       position: relative;
@@ -271,145 +240,65 @@
     }
     input, select {
       width: 100%;
-      padding: 15px 15px 15px 45px;
-      border-radius: 6px;
-      border: 1px solid var(--border-color);
-      background-color: var(--background);
-      color: var(--light-text);
-      font-size: 16px;
-      outline: none;
-      transition: all 0.2s ease;
-    }
-    input:focus, select:focus {
-      border-color: var(--primary-color);
-      background-color: var(--card-bg);
-    }
-    input::placeholder {
-      color: var(--gray-text);
-    }
-    
-    /* Inputs estilo Google */
-    #loginScreen input,
-    #registerScreen input,
-    #forgotPasswordScreen input {
       padding: 13px 15px;
-      border: 1px solid var(--google-border);
       border-radius: 4px;
+      border: 1px solid var(--google-border);
       background-color: var(--google-bg);
       color: var(--google-text);
       font-size: 16px;
+      outline: none;
       transition: all 0.15s ease;
     }
-    
-    #loginScreen input:hover,
-    #registerScreen input:hover,
-    #forgotPasswordScreen input:hover {
+    input:hover, select:hover {
       border-color: var(--google-gray);
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
-    
-    #loginScreen input:focus,
-    #registerScreen input:focus,
-    #forgotPasswordScreen input:focus {
+    input:focus, select:focus {
       border-color: var(--google-blue);
       border-width: 2px;
       padding: 12px 14px;
       background-color: var(--google-focus);
       box-shadow: 0 1px 6px rgba(26, 115, 232, 0.3);
     }
-    
-    #loginScreen input::placeholder,
-    #registerScreen input::placeholder,
-    #forgotPasswordScreen input::placeholder {
+    input::placeholder {
       color: var(--google-text-secondary);
     }
     
-    /* Ocultar iconos en inputs de Google */
-    #loginScreen .input-group i,
-    #registerScreen .input-group i,
-    #forgotPasswordScreen .input-group i {
+    /* Ocultar iconos en inputs */
+    .input-group i {
       display: none;
-    }
-    
-    #loginScreen input,
-    #registerScreen input,
-    #forgotPasswordScreen input {
-      padding-left: 15px !important;
     }
     .btn {
       width: 100%;
-      padding: 15px 24px;
+      padding: 10px 24px;
       border: none;
-      border-radius: 9999px;
-      font-size: 15px;
-      font-weight: 700;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
       text-align: center;
-      margin-top: 20px;
-      min-height: 50px;
+      margin-top: 24px;
+      min-height: 40px;
+      letter-spacing: 0.25px;
     }
     .btn-primary {
-      background-color: var(--primary-color);
+      background-color: var(--google-blue);
       color: white;
     }
     .btn-primary:hover {
-      background-color: #1A8CD8;
-    }
-    .btn-outline {
-      background-color: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--light-text);
-    }
-    .btn-outline:hover {
-      background-color: var(--hover-bg);
-    }
-    
-    /* Botones estilo Google */
-    #loginScreen .btn-primary,
-    #registerScreen .btn-primary,
-    #forgotPasswordScreen .btn-primary {
-      background-color: var(--google-blue);
-      border-radius: 4px;
-      padding: 10px 24px;
-      font-size: 14px;
-      font-weight: 500;
-      letter-spacing: 0.25px;
-      text-transform: none;
-      box-shadow: none;
-      margin-top: 24px;
-      min-height: 40px;
-    }
-    
-    #loginScreen .btn-primary:hover,
-    #registerScreen .btn-primary:hover,
-    #forgotPasswordScreen .btn-primary:hover {
       background-color: var(--google-blue-hover);
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
-    
-    #loginScreen .btn-primary:active,
-    #registerScreen .btn-primary:active,
-    #forgotPasswordScreen .btn-primary:active {
+    .btn-primary:active {
       background-color: var(--google-blue-active);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     }
-    
-    #loginScreen .btn-outline,
-    #registerScreen .btn-outline,
-    #forgotPasswordScreen .btn-outline {
+    .btn-outline {
       background-color: transparent;
       border: 1px solid var(--google-border);
       color: var(--google-blue);
-      border-radius: 4px;
-      padding: 10px 24px;
-      font-size: 14px;
-      font-weight: 500;
     }
-    
-    #loginScreen .btn-outline:hover,
-    #registerScreen .btn-outline:hover,
-    #forgotPasswordScreen .btn-outline:hover {
+    .btn-outline:hover {
       background-color: var(--google-hover);
       border-color: var(--google-gray);
     }
@@ -418,39 +307,25 @@
       text-align: center;
     }
     .links a {
-      color: var(--secondary-color);
-      text-decoration: none;
-      font-size: 14px;
-    }
-    
-    /* Links estilo Google */
-    #loginScreen .links a,
-    #registerScreen .links a,
-    #forgotPasswordScreen .links a,
-    #loginScreen a,
-    #registerScreen a,
-    #forgotPasswordScreen a {
       color: var(--google-blue);
       text-decoration: none;
       font-size: 14px;
       font-weight: 500;
     }
-    
-    #loginScreen .links a:hover,
-    #registerScreen .links a:hover,
-    #forgotPasswordScreen .links a:hover,
-    #loginScreen a:hover,
-    #registerScreen a:hover,
-    #forgotPasswordScreen a:hover {
+    .links a:hover {
       text-decoration: underline;
     }
-    
-    #loginScreen p,
-    #registerScreen p,
-    #forgotPasswordScreen p {
+    a {
+      color: var(--google-blue);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    p {
       color: var(--google-text);
       font-size: 14px;
-      margin-top: 24px;
     }
     .divider {
       display: flex;
@@ -496,15 +371,20 @@
       width: 120px;
       height: 120px;
       border-radius: 60px;
-      background-color: var(--card-bg);
+      background-color: var(--google-hover);
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto 20px;
       position: relative;
       overflow: hidden;
-      border: 2px dashed #ddd;
+      border: 2px dashed var(--google-border);
       cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .avatar-upload:hover {
+      border-color: var(--google-blue);
+      background-color: var(--google-focus);
     }
     .avatar-upload i {
       font-size: 40px;
@@ -1744,15 +1624,15 @@
 <body>
   <!-- La marca de agua se mostrará únicamente en el videoCallScreen -->
   <div class="watermark">BealyChat</div>
-  <!-- Ícono de Estado de Cuenta -->
+  <!-- Ícono de Estado de Cuenta (solo en videollamada) -->
   <div class="account-status-icon" 
        onclick="openAccountStatusScreen()"
-       style="display: flex;">
+       style="display: none;">
     <i class="fa-solid fa-user-shield"></i>
   </div>
-  <!-- Ícono de Reporte -->
+  <!-- Ícono de Reporte (solo en videollamada) -->
   <div class="report-icon" onclick="openReportModal()"
-       style="display: flex;">
+       style="display: none;">
     <i class="fa-solid fa-flag"></i>
   </div>
 
@@ -2641,6 +2521,10 @@ username:
       }
       // Si es videoCallScreen, iniciamos streaming + matching
       if(screenId === 'videoCallScreen'){
+        // Mostrar iconos de moderación solo en videollamada
+        document.querySelector('.account-status-icon').style.display = 'flex';
+        document.querySelector('.report-icon').style.display = 'flex';
+        
         startLocalStream();
         showConnecting();
         startMatching();
@@ -2649,6 +2533,10 @@ username:
           startSpeechMonitoring();
         }, 2000);
       } else {
+        // Ocultar iconos de moderación en otras pantallas
+        document.querySelector('.account-status-icon').style.display = 'none';
+        document.querySelector('.report-icon').style.display = 'none';
+        
         // Detener monitoreo si salimos de la videollamada
         stopSpeechMonitoring();
       }
