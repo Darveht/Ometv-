@@ -928,45 +928,51 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
-      padding: 20px;
-      border-radius: 12px;
+      gap: 12px;
+      padding: 24px;
+      border-radius: 8px;
       margin-top: 16px;
     }
     
     .report-success-message {
-      background: rgba(0, 186, 124, 0.1);
-      border: 1px solid rgba(0, 186, 124, 0.3);
+      background: #e6f4ea;
+      border: 1px solid #34a853;
     }
     
     .report-success-message i {
-      font-size: 32px;
-      color: var(--success-color);
+      font-size: 48px;
+      color: #34a853;
       animation: successPulse 0.6s ease;
     }
     
     .report-success-message p:first-of-type {
-      font-weight: 700;
-      color: var(--success-color);
+      font-weight: 500;
+      color: var(--google-text);
       margin: 0;
       font-size: 16px;
     }
     
     .report-success-message p:last-of-type {
-      color: var(--gray-text);
+      color: var(--google-text-secondary);
       margin: 0;
       font-size: 14px;
     }
     
     .report-error-message {
-      background: rgba(244, 33, 46, 0.1);
-      border: 1px solid rgba(244, 33, 46, 0.3);
+      background: #fce8e6;
+      border: 1px solid #ea4335;
     }
     
     .report-error-message i {
-      font-size: 32px;
-      color: var(--danger-color);
+      font-size: 48px;
+      color: #ea4335;
       animation: errorShake 0.5s ease;
+    }
+    
+    .report-error-message p {
+      color: var(--google-text);
+      margin: 0;
+      font-size: 14px;
     }
     
     @keyframes successPulse {
@@ -983,23 +989,20 @@
     
     /* Animaciones para opciones de reporte */
     .report-option {
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
     }
     
     .report-option:hover {
-      transform: translateX(4px);
+      transform: translateY(-1px);
     }
     
     /* Animación del botón de reporte */
     .btn-report {
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
+      transition: all 0.2s ease;
     }
     
     .btn-report:not(:disabled):hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(244, 33, 46, 0.3);
     }
     
     .btn-report .fa-spinner {
