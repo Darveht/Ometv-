@@ -608,6 +608,34 @@
       pointer-events: auto;
     }
 
+    /* Indicador de cámara offline */
+    .camera-offline {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 5;
+    }
+    .camera-offline.active {
+      display: flex;
+    }
+    .camera-offline i {
+      font-size: 48px;
+      color: #fff;
+    }
+    .camera-offline p {
+      color: #fff;
+      font-size: 16px;
+      margin: 0;
+    }
+
     
 
     /* ====================== PANTALLA DE CUENTA BLOQUEADA ====================== */
@@ -1798,11 +1826,19 @@
         <div class="video-container">
           <div class="local-video">
             <video id="localVideo" autoplay playsinline muted></video>
+            <div class="camera-offline" id="localCameraOffline">
+              <i class="fa-solid fa-video-slash"></i>
+              <p>Cámara Offline</p>
+            </div>
           </div>
         </div>
         <div class="video-container">
           <div class="remote-video" id="remoteVideoContainer">
             <video id="remoteVideo" autoplay playsinline></video>
+            <div class="camera-offline" id="remoteCameraOffline">
+              <i class="fa-solid fa-video-slash"></i>
+              <p>Cámara Offline</p>
+            </div>
           <!-- Info básica del usuario -->
           <div class="user-info" id="remoteUserInfo">
             <img id="remoteAvatar" src="/api/placeholder/30/30" alt="User" width="30" height="30">
@@ -3325,9 +3361,20 @@
     }
     function toggleVideo(){
       if(!localStream) return;
-      localStream.getVideoTracks().forEach(track => track.enabled = !track.enabled);
-      document.getElementById('videoIcon').classList.toggle('fa-video-slash');
-      document.getElementById('videoIcon').classList.toggle('fa-video');
+      const videoTrack = localStream.getVideoTracks()[0];
+      if(videoTrack) {
+        videoTrack.enabled = !videoTrack.enabled;
+        document.getElementById('videoIcon').classList.toggle('fa-video-slash');
+        document.getElementById('videoIcon').classList.toggle('fa-video');
+        
+        // Mostrar/ocultar indicador de cámara offline
+        const offlineIndicator = document.getElementById('localCameraOffline');
+        if(videoTrack.enabled) {
+          offlineIndicator.classList.remove('active');
+        } else {
+          offlineIndicator.classList.add('active');
+        }
+      }
     }
     function restartCall(){
       showConnecting();
