@@ -2849,9 +2849,11 @@
     /* ====================== PRESENCIA Y MATCHING ====================== */
     async function startMatching(){
       if(!currentUser || !currentProfile || !currentProfile.username || !currentProfile.avatar_url || !currentProfile.country || !currentProfile.birthDate){
-        console.error("Perfil incompleto, no se puede marcar como online");
+        console.error("❌ Perfil incompleto, no se puede marcar como online");
         return;
       }
+      
+      console.log("✅ Marcando usuario como online:", currentUser.uid);
       const userRef = database.ref('onlineUsers/' + currentUser.uid);
       await userRef.set({
         username: currentProfile.username,
@@ -2861,27 +2863,42 @@
         timestamp: firebase.database.ServerValue.TIMESTAMP
       });
       userRef.onDisconnect().remove();
-      findRandomUser();
+      
+      // Esperar 1 segundo antes de buscar
+      setTimeout(() => {
+        findRandomUser();
+      }, 1000);
     }
+    
     async function findRandomUser(){
+      console.log("🔍 Buscando usuarios online...");
       const snapshot = await database.ref('onlineUsers').once('value');
       const online = snapshot.val() || {};
       const uids = Object.keys(online).filter(uid => uid !== currentUser.uid);
+      
+      console.log("👥 Usuarios online:", uids.length);
+      
       if(uids.length === 0){
-        console.log("Nadie disponible, reintentando en 3s...");
+        console.log("⏳ Nadie disponible, reintentando en 3s...");
         setTimeout(findRandomUser, 3000);
         return;
       }
+      
       const randomUid = uids[Math.floor(Math.random() * uids.length)];
+      console.log("🎯 Usuario seleccionado:", randomUid);
       createCall(randomUid);
     }
+    
     async function createCall(remoteUid){
       const callId = database.ref('calls').push().key;
       currentCallId = callId;
+      console.log("📞 Creando llamada:", callId);
+      
       await database.ref('calls/' + callId + '/participants').set({
         caller: currentUser.uid,
         callee: remoteUid
       });
+      
       startWebRTC(callId, true);
     }
     database.ref('calls').on('child_added', snapshot => {
