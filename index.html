@@ -3069,17 +3069,27 @@
       };
       
       try {
+        console.log("🚫 Bloqueando usuario:", currentUser.uid, blockData);
+        
         // Actualizar perfil del usuario
         await database.ref(`profiles/${currentUser.uid}`).update(blockData);
+        console.log("✅ Perfil actualizado con bloqueo");
         
-        // Registrar el bloqueo
+        // Registrar el bloqueo en nodo separado
         await database.ref(`blocks/${currentUser.uid}`).push({
           reason: blockData.blockReason,
           detectedWord: detectedWord,
           duration: BLOCK_DURATION_DAYS,
+          blockedUntil: blockUntil.toISOString(),
           timestamp: firebase.database.ServerValue.TIMESTAMP,
           automatic: true
         });
+        console.log("✅ Bloqueo registrado en /blocks");
+        
+        // Actualizar perfil local
+        currentProfile.blocked = true;
+        currentProfile.blockedUntil = blockUntil.toISOString();
+        currentProfile.blockReason = blockData.blockReason;
         
         // Mostrar modal de bloqueo
         showBlockModal(detectedWord, blockUntil);
@@ -3093,12 +3103,12 @@
         }
         
         // Remover del listado de usuarios online
-        database.ref(`onlineUsers/${currentUser.uid}`).remove();
+        await database.ref(`onlineUsers/${currentUser.uid}`).remove();
         
         console.log(`🚫 Usuario bloqueado por ${BLOCK_DURATION_DAYS} días por: "${detectedWord}"`);
         
       } catch (error) {
-        console.error('Error bloqueando usuario:', error);
+        console.error('❌ Error bloqueando usuario:', error);
       }
     }
 
