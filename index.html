@@ -3359,6 +3359,10 @@ username:
       const avatar = document.getElementById('reportUserAvatar');
       const username = document.getElementById('reportUsername');
 
+      // Ocultar iconos de moderación
+      document.querySelector('.account-status-icon').style.display = 'none';
+      document.querySelector('.report-icon').style.display = 'none';
+
       // Obtener información del usuario remoto
       if(remoteUidGlobal) {
         database.ref('profiles/' + remoteUidGlobal).once('value')
@@ -3377,6 +3381,10 @@ username:
     function closeReportModal() {
       document.getElementById('reportModal').classList.remove('active');
       document.getElementById('reportStatus').innerHTML = "";
+      
+      // Mostrar iconos de moderación nuevamente
+      document.querySelector('.account-status-icon').style.display = 'flex';
+      document.querySelector('.report-icon').style.display = 'flex';
       
       // Resetear selecciones
       selectedReportOption = null;
@@ -3666,6 +3674,10 @@ username:
 
     /* ====================== PANTALLA DE ESTADO DE CUENTA ====================== */
     function openAccountStatusScreen() {
+      // Ocultar iconos de moderación
+      document.querySelector('.account-status-icon').style.display = 'none';
+      document.querySelector('.report-icon').style.display = 'none';
+      
       goToScreen('accountStatusScreen');
       const scanAvatar = document.getElementById('scanAvatar');
       scanAvatar.src = currentProfile.avatar_url || 'https://cdn-icons-png.flaticon.com/512/3237/3237472.png';
