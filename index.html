@@ -91,22 +91,22 @@
     #videoCallScreen .watermark {
       display: block;
     }
-    /* Íconos de estado de cuenta y reporte estilo Twitter */
+    /* Íconos de estado de cuenta y reporte estilo Google */
     .account-status-icon,
     .report-icon {
       position: fixed;
-      width: 36px;
-      height: 36px;
+      width: 48px;
+      height: 48px;
       cursor: pointer;
       z-index: 1100;
       right: 16px;
-      background-color: rgba(22, 24, 28, 0.8);
+      background-color: rgba(255, 255, 255, 0.95);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid var(--border-color);
-      backdrop-filter: blur(12px);
+      border: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
       transition: all 0.2s ease;
     }
     
@@ -115,20 +115,20 @@
     }
     
     .report-icon {
-      top: 68px;
+      top: 76px;
     }
 
     .account-status-icon:hover,
     .report-icon:hover {
-      background-color: var(--hover-bg);
-      border-color: var(--gray-text);
+      background-color: rgba(255, 255, 255, 1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       transform: scale(1.05);
     }
 
     .account-status-icon i,
     .report-icon i {
-      color: var(--light-text);
-      font-size: 18px;
+      color: var(--google-text);
+      font-size: 20px;
     }
     .screen {
       width: 100vw;
@@ -2403,14 +2403,14 @@
     const configuration = {
       iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun1.l.google.com:19302" },
         {
-          urls:
-"turn:relay1.expressturn.com:3478",
-username:
-"efMS1DHVA7SM7GJ775", credential:
-"n2IsFT3aam|3waju"
+          urls: "turn:relay1.expressturn.com:3478",
+          username: "efMS1DHVA7SM7GJ775",
+          credential: "n2IsFT3aam|3waju"
         }
-      ]
+      ],
+      iceCandidatePoolSize: 10
     };
 
     /* ====================== FUNCIONES DE BÚSQUEDA DE PAÍSES ====================== */
@@ -2866,8 +2866,8 @@ username:
       const online = snapshot.val() || {};
       const uids = Object.keys(online).filter(uid => uid !== currentUser.uid);
       if(uids.length === 0){
-        console.log("Nadie disponible, reintentando en 5s...");
-        setTimeout(findRandomUser, 5000);
+        console.log("Nadie disponible, reintentando en 3s...");
+        setTimeout(findRandomUser, 3000);
         return;
       }
       const randomUid = uids[Math.floor(Math.random() * uids.length)];
