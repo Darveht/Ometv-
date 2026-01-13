@@ -3118,7 +3118,11 @@
     async function startLocalStream(){
       try {
         localStream = await navigator.mediaDevices.getUserMedia({ 
-          video: true, 
+          video: {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            facingMode: "user"
+          }, 
           audio: {
             echoCancellation: true,
             noiseSuppression: true,
@@ -3129,55 +3133,69 @@
         // Mostrar video local
         const localVideo = document.getElementById('localVideo');
         localVideo.srcObject = localStream;
-        localVideo.play().catch(e => console.error("Error reproduciendo video local:", e));
+        await localVideo.play();
+        console.log("✅ Video local iniciado");
       } catch(error){
-        console.error("Error accediendo a cámara y micrófono:", error);
+        console.error("❌ Error accediendo a cámara y micrófono:", error);
         alert("No se pudo acceder a la cámara/micrófono. Verifica los permisos.");
       }
     }
     function startWebRTC(callId, isCaller){
       peerConnection = new RTCPeerConnection(configuration);
-      console.log("Iniciando WebRTC, es caller?", isCaller);
+      console.log("🔄 Iniciando WebRTC, es caller?", isCaller);
+      
       if(localStream){
         localStream.getTracks().forEach(track => {
           peerConnection.addTrack(track, localStream);
+          console.log("➕ Track agregado:", track.kind);
         });
       } else {
-        console.warn("No hay stream local disponible");
+        console.warn("⚠️ No hay stream local disponible");
       }
+      
       // Indicador de conexión
       peerConnection.oniceconnectionstatechange = () => {
+        console.log("🔌 ICE Connection State:", peerConnection.iceConnectionState);
         const indicator = document.getElementById('connectionIndicator');
         if(peerConnection.iceConnectionState === "connected" || peerConnection.iceConnectionState === "completed"){
           indicator.style.backgroundColor = "green";
+          console.log("✅ Conexión establecida");
         } else if(peerConnection.iceConnectionState === "disconnected" || peerConnection.iceConnectionState === "failed"){
           indicator.style.backgroundColor = "red";
+          console.log("❌ Conexión fallida o desconectada");
         } else {
           indicator.style.backgroundColor = "orange";
         }
       };
+      
       peerConnection.ontrack = (event) => {
-        console.log("Evento ontrack:", event);
+        console.log("📹 Evento ontrack recibido:", event.track.kind);
         const remoteVideo = document.getElementById('remoteVideo');
         if(event.streams && event.streams[0]){
           remoteStream = event.streams[0];
           remoteVideo.srcObject = remoteStream;
+          console.log("✅ Stream remoto asignado");
         } else {
           if(!remoteStream){
             remoteStream = new MediaStream();
             remoteVideo.srcObject = remoteStream;
           }
           remoteStream.addTrack(event.track);
+          console.log("✅ Track remoto agregado");
         }
-        remoteVideo.play().catch(e => console.error("Error al reproducir video remoto:", e));
-        hideConnecting();
+        remoteVideo.play().then(() => {
+          console.log("✅ Video remoto reproduciendo");
+          hideConnecting();
+        }).catch(e => console.error("❌ Error al reproducir video remoto:", e));
       };
+      
       peerConnection.onicecandidate = event => {
         if(event.candidate){
-          console.log("Enviando ICE candidate:", event.candidate);
+          console.log("🧊 Enviando ICE candidate");
           database.ref(`calls/${callId}/iceCandidates/${currentUser.uid}`).push(JSON.stringify(event.candidate));
         }
       };
+      
       database.ref(`calls/${callId}/iceCandidates`).on('child_added', snapshot => {
         const userUid = snapshot.key;
         if(userUid !== currentUser.uid){
@@ -3185,11 +3203,14 @@
             const candidateData = candidateSnap.val();
             if(candidateData){
               const candidate = new RTCIceCandidate(JSON.parse(candidateData));
-              peerConnection.addIceCandidate(candidate).catch(e => console.error("Error agregando ICE candidate:", e));
+              peerConnection.addIceCandidate(candidate)
+                .then(() => console.log("✅ ICE candidate agregado"))
+                .catch(e => console.error("❌ Error agregando ICE candidate:", e));
             }
           });
         }
       });
+      
       if(isCaller){
         createOffer(callId);
       } else {
@@ -3199,36 +3220,39 @@
             try {
               const offer = new RTCSessionDescription(JSON.parse(offerData));
               await peerConnection.setRemoteDescription(offer);
+              console.log("✅ Oferta recibida y aplicada");
               const answer = await peerConnection.createAnswer();
               await peerConnection.setLocalDescription(answer);
               await database.ref(`calls/${callId}/answer`).set(JSON.stringify(answer));
-              console.log("Respuesta enviada");
+              console.log("✅ Respuesta enviada");
             } catch(err){
-              console.error("Error procesando la oferta:", err);
+              console.error("❌ Error procesando la oferta:", err);
             }
           }
         });
       }
+      
       database.ref(`calls/${callId}/answer`).on('value', async snapshot => {
         const answerData = snapshot.val();
         if(answerData && peerConnection.signalingState === 'have-local-offer'){
           try {
             const answer = new RTCSessionDescription(JSON.parse(answerData));
             await peerConnection.setRemoteDescription(answer);
-            console.log("Respuesta recibida y aplicada");
+            console.log("✅ Respuesta recibida y aplicada");
           } catch(err){
-            console.error("Error al aplicar respuesta:", err);
+            console.error("❌ Error al aplicar respuesta:", err);
           }
         }
       });
+      
       // Cargar info del usuario remoto
       database.ref(`calls/${callId}/participants`).once('value', snap => {
         const parts = snap.val() || {};
         let remoteUid = isCaller ? parts.callee : parts.caller;
         remoteUidGlobal = remoteUid;
-        console.log("remoteUid detectado:", remoteUid);
+        console.log("👤 remoteUid detectado:", remoteUid);
         if(!remoteUid){
-          console.error("No se encontró remoteUid");
+          console.error("❌ No se encontró remoteUid");
           document.getElementById('remoteName').textContent = "";
           document.getElementById('remoteAvatar').src = '/api/placeholder/30/30';
           return;
@@ -3239,15 +3263,9 @@
             document.getElementById('remoteAvatar').src = rProfile.avatar_url || '/api/placeholder/30/30';
             let nameText = rProfile.username ? rProfile.username : "";
             document.getElementById('remoteName').textContent = nameText;
-            if(rProfile.verified){
-              document.getElementById('remoteVerifiedBadge').style.display = 'inline';
-            } else {
-              document.getElementById('remoteVerifiedBadge').style.display = 'none';
-            }
           } else {
             document.getElementById('remoteName').textContent = "";
             document.getElementById('remoteAvatar').src = '/api/placeholder/30/30';
-            document.getElementById('remoteVerifiedBadge').style.display = 'none';
           }
         });
       });
