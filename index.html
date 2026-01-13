@@ -163,40 +163,27 @@
       width: 100%;
       max-width: 450px;
       margin: 0 auto;
-      padding: 40px 20px;
+      padding: 60px 40px;
       text-align: center;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
+      justify-content: center;
       box-sizing: border-box;
     }
     
-    /* Estilos específicos para pantallas de auth estilo Google */
-    #loginScreen .screen-content,
-    #registerScreen .screen-content,
-    #forgotPasswordScreen .screen-content,
-    #profileSetupScreen .screen-content,
-    #countryScreen .screen-content {
+    /* Fondo blanco completo para pantallas de auth */
+    #loginScreen,
+    #registerScreen,
+    #forgotPasswordScreen,
+    #profileSetupScreen,
+    #countryScreen {
       background-color: var(--google-bg);
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
-      padding: 48px 40px 36px;
-      margin: 40px auto;
-      min-height: auto;
-      max-width: 450px;
     }
     
     @media (max-width: 768px) {
-      #loginScreen .screen-content,
-      #registerScreen .screen-content,
-      #forgotPasswordScreen .screen-content,
-      #profileSetupScreen .screen-content,
-      #countryScreen .screen-content {
-        margin: 20px;
-        padding: 32px 24px;
-        box-shadow: none;
-        border: 1px solid var(--google-border);
+      .screen-content {
+        padding: 40px 24px;
       }
     }
     
